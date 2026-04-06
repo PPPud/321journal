@@ -310,15 +310,17 @@ if (e) return { events: e.events.slice(), thanks: e.thanks.slice(), tomorrow: e.
 return { events: [””,””,””], thanks: [””,””], tomorrow: “” };
 }
 
-document.getElementById(“today-label”).textContent = formatDate(todayKey);
-updateStreak();
-renderToday();
-
 if (“serviceWorker” in navigator) {
 window.addEventListener(“load”, function() {
 navigator.serviceWorker.register(”./sw.js”).catch(function(){});
 });
 }
+
+window.addEventListener(“DOMContentLoaded”, function() {
+document.getElementById(“today-label”).textContent = formatDate(todayKey);
+updateStreak();
+renderToday();
+});
 
 function updateStreak() {
 var count = Object.keys(entries).length;
