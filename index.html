@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>3·2·1 每日紀錄</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: #0d0c14;
+    font-family: -apple-system, 'PingFang TC', 'Microsoft JhengHei', Georgia, serif;
+    color: #fffffe;
+    overflow-x: hidden;
+  }
+
+  .bg-grad {
+    position: fixed; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse at 15% 15%, #1c1538 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 85%, #0b1c2e 0%, transparent 55%);
+  }
+  .bg-glow {
+    position: fixed; top: -100px; right: -60px;
+    width: 280px; height: 280px; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle, rgba(255,195,100,0.07) 0%, transparent 70%);
+  }
+
+  .wrap {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 36px 20px 100px;
+  }
+
+  header { text-align: center; margin-bottom: 32px; }
+  .eyebrow { font-size: 10px; letter-spacing: 0.4em; color: #7a768f; margin-bottom: 8px; text-transform: uppercase; }
+  h1 {
+    font-size: 52px; font-weight: 700; letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #ffc364 0%, #ff8c6b 45%, #e06c9f 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .date-label { font-size: 13px; color: #5c5875; margin-top: 6px; }
+  .streak { font-size: 11px; color: #4a4660; margin-top: 4px; min-height: 16px; }
+
+  nav {
+    display: flex; gap: 6px; margin-bottom: 28px;
+    background: rgba(255,255,255,0.04); border-radius: 12px; padding: 4px;
+  }
+  nav button {
+    flex: 1; padding: 10px 8px; border: none; border-radius: 9px;
+    font-size: 13px; font-family: inherit; cursor: pointer; font-weight: 400;
+    background: transparent; color: #5c5875; transition: all 0.2s;
+  }
+  nav button.active { background: rgba(255,195,100,0.14); color: #ffc364; font-weight: 600; }
+
+  .section { margin-bottom: 28px; }
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .section-num {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+  }
+  .section-label { font-size: 12px; color: #7a768f; letter-spacing: 0.06em; }
+
+  .input-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+  .input-idx { font-size: 11px; color: #3c3a50; padding-top: 14px; width: 12px; text-align: right; flex-shrink: 0; }
+  textarea {
+    flex: 1; background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07); border-radius: 10px;
+    padding: 12px 14px; color: #fffffe; font-size: 14px;
+    font-family: inherit; resize: none; line-height: 1.65;
+    transition: border-color 0.2s; overflow: hidden; min-height: 44px;
+  }
+  textarea:focus { outline: none; border-color: rgba(255,195,100,0.35); }
+  textarea::placeholder { color: #3c3a50; }
+
+  #save-btn {
+    width: 100%; padding: 16px; margin-top: 4px;
+    border: 1px solid rgba(255,195,100,0.25); border-radius: 14px;
+    background: linear-gradient(135deg, rgba(255,195,100,0.12), rgba(224,108,159,0.12));
+    color: #ffc364; font-size: 15px; font-family: inherit;
+    cursor: pointer; font-weight: 600; letter-spacing: 0.04em; transition: all 0.3s;
+  }
+  #save-btn.saved { border-color: rgba(100,200,130,0.3); background: rgba(100,200,130,0.12); color: #64c882; }
+  #save-btn.error { border-color: rgba(255,100,100,0.3); background: rgba(255,100,100,0.12); color: #ff6464; }
+  #save-btn:active { opacity: 0.75; }
+
+  .save-hint { text-align: center; margin-top: 10px; font-size: 12px; color: #3c3a50; }
+  .saved-notice {
+    margin-bottom: 20px; padding: 10px 14px;
+    background: rgba(100,200,130,0.08); border-radius: 10px;
+    font-size: 12px; color: #64c882; border: 1px solid rgba(100,200,130,0.2);
+  }
+
+  .history-meta { display: flex; justify-content: space-between; font-size: 12px; color: #4a4660; margin-bottom: 16px; }
+  .history-empty { text-align: center; padding: 60px 20px; color: #4a4660; }
+  .history-empty .moon { font-size: 32px; margin-bottom: 12px; }
+  .history-empty p { font-size: 14px; }
+  .history-empty small { font-size: 12px; color: #3a3650; margin-top: 6px; display: block; }
+
+  .entry-card {
+    width: 100%; text-align: left; padding: 16px 18px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px; cursor: pointer; font-family: inherit; color: #fffffe;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px; transition: all 0.15s;
+  }
+  .entry-card.today-card { background: rgba(255,195,100,0.06); border-color: rgba(255,195,100,0.2); }
+  .entry-card:active { opacity: 0.75; }
+  .entry-date { font-size: 13px; color: #a8a4c0; margin-bottom: 4px; }
+  .entry-card.today-card .entry-date { color: #ffc364; }
+  .entry-stats { font-size: 11px; color: #4a4660; }
+  .entry-star { font-size: 16px; color: #3c3a50; }
+  .entry-star.done { color: #ffc364; }
+
+  .back-btn {
+    background: none; border: none; color: #7a768f; cursor: pointer;
+    font-size: 13px; font-family: inherit; margin-bottom: 20px; padding: 0;
+  }
+  .detail-date { font-size: 14px; color: #a8a4c0; margin-bottom: 24px; }
+  .detail-section { margin-bottom: 22px; }
+  .detail-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .detail-num {
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .detail-label { font-size: 11px; color: #5c5875; }
+  .detail-item {
+    padding: 12px 16px; background: rgba(255,255,255,0.03);
+    border-radius: 10px; font-size: 14px; line-height: 1.7;
+    color: #ccc8e4; margin-bottom: 6px;
+  }
+  .detail-empty { font-size: 13px; color: #3c3a50; font-style: italic; padding-left: 4px; }
+  .detail-timestamp { font-size: 11px; color: #3c3a50; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="bg-grad"></div>
+<div class="bg-glow"></div>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">每日紀錄</p>
+    <h1>3·2·1</h1>
+    <p class="date-label" id="today-label"></p>
+    <p class="streak" id="streak-label"></p>
+  </header>
+
+  <nav>
+    <button class="active" id="nav-today" onclick="switchView('today')">✦ 今天</button>
+    <button id="nav-history" onclick="switchView('history')">回顧</button>
+  </nav>
+
+  <div id="view-today"></div>
+  <div id="view-history" style="display:none"></div>
+  <div id="view-detail" style="display:none"></div>
+</div>
+
+<script>
+const STORAGE_KEY = "321journal-v1";
+
+function getTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("zh-TW", { year:"numeric", month:"long", day:"numeric", weekday:"long" });
+}
+
+function isComplete(e) {
+  return e && e.events && e.events.every(v=>v.trim()) &&
+    e.thanks && e.thanks.every(v=>v.trim()) && e.tomorrow && e.tomorrow.trim();
+}
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+}
+
+function saveData(data) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); return true; } catch { return false; }
+}
+
+const todayKey = getTodayKey();
+let entries = loadData();
+let draft = entries[todayKey]
+  ? { ...entries[todayKey] }
+  : { events: ["","",""], thanks: ["",""], tomorrow: "" };
+
+document.getElementById("today-label").textContent = formatDate(todayKey);
+updateStreak();
+renderToday();
+
+function updateStreak() {
+  const count = Object.keys(entries).length;
+  const done = Object.values(entries).filter(isComplete).length;
+  document.getElementById("streak-label").textContent =
+    count > 0 ? `已累積 ${count} 天紀錄 · 完整 ${done} 天 ✦` : "";
+  const allDates = Object.keys(entries);
+  document.getElementById("nav-history").textContent =
+    `回顧${allDates.length > 0 ? ` (${allDates.length})` : ""}`;
+}
+
+function switchView(v) {
+  document.getElementById("view-today").style.display = v === "today" ? "" : "none";
+  document.getElementById("view-history").style.display = v === "history" ? "" : "none";
+  document.getElementById("view-detail").style.display = "none";
+  document.getElementById("nav-today").className = v === "today" ? "active" : "";
+  document.getElementById("nav-history").className = v === "history" ? "active" : "";
+  if (v === "history") renderHistory();
+}
+
+function renderToday() {
+  const already = entries[todayKey]?.savedAt;
+  document.getElementById("view-today").innerHTML = `
+    ${already ? `<div class="saved-notice">✓ 今天已有儲存紀錄，可繼續編輯</div>` : ""}
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num" style="background:rgba(255,195,100,0.15);border:1px solid rgba(255,195,100,0.35);color:#ffc364">3</div>
+        <span class="section-label">今天發生的事</span>
+      </div>
+      ${[0,1,2].map(i=>`
+        <div class="input-row">
+          <span class="input-idx">${i+1}</span>
+          <textarea id="event-${i}" placeholder="${["寫下第一件事…","寫下第二件事…","寫下第三件事…"][i]}" oninput="onDraft('event',${i},this.value);autoResize(this)">${esc(draft.events[i])}</textarea>
+        </div>`).join("")}
+    </div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num" style="background:rgba(224,108,159,0.15);border:1px solid rgba(224,108,159,0.35);color:#e06c9f">2</div>
+        <span class="section-label">今天感謝的事</span>
+      </div>
+      ${[0,1].map(i=>`
+        <div class="input-row">
+          <span class="input-idx">${i+1}</span>
+          <textarea id="thank-${i}" placeholder="${["感謝什麼…","還有什麼…"][i]}" oninput="onDraft('thank',${i},this.value);autoResize(this)">${esc(draft.thanks[i])}</textarea>
+        </div>`).join("")}
+    </div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num" style="background:rgba(108,159,224,0.15);border:1px solid rgba(108,159,224,0.35);color:#6c9fe0">1</div>
+        <span class="section-label">明天想做的一件事</span>
+      </div>
+      <div class="input-row">
+        <textarea id="tomorrow" placeholder="一個小小的目標…" oninput="onDraft('tomorrow',null,this.value);autoResize(this)">${esc(draft.tomorrow)}</textarea>
+      </div>
+    </div>
+    <button id="save-btn" onclick="handleSave()">儲存今天的紀錄</button>
+    <p class="save-hint" id="save-hint">${isComplete(draft) ? "✦ 今日紀錄完整" : "尚有欄位未填寫"}</p>
+  `;
+  document.querySelectorAll("textarea").forEach(t => autoResize(t));
+}
+
+function esc(str) {
+  return (str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function onDraft(type, i, val) {
+  if (type === "event") draft.events[i] = val;
+  else if (type === "thank") draft.thanks[i] = val;
+  else draft.tomorrow = val;
+  document.getElementById("save-hint").textContent = isComplete(draft) ? "✦ 今日紀錄完整" : "尚有欄位未填寫";
+}
+
+function autoResize(el) {
+  el.style.height = "auto";
+  el.style.height = el.scrollHeight + "px";
+}
+
+function handleSave() {
+  const btn = document.getElementById("save-btn");
+  btn.disabled = true;
+  btn.textContent = "儲存中…";
+  btn.className = "";
+  entries[todayKey] = { ...draft, savedAt: new Date().toISOString() };
+  const ok = saveData(entries);
+  if (ok) {
+    btn.className = "saved";
+    btn.textContent = "✓ 已儲存";
+    updateStreak();
+    setTimeout(() => { btn.disabled = false; btn.className = ""; btn.textContent = "儲存今天的紀錄"; }, 2500);
+  } else {
+    btn.className = "error";
+    btn.textContent = "儲存失敗，請再試";
+    setTimeout(() => { btn.disabled = false; btn.className = ""; btn.textContent = "儲存今天的紀錄"; }, 3000);
+  }
+}
+
+function renderHistory() {
+  const dates = Object.keys(entries).sort((a,b)=>b.localeCompare(a));
+  if (dates.length === 0) {
+    document.getElementById("view-history").innerHTML = `
+      <div class="history-empty">
+        <div class="moon">🌙</div>
+        <p>還沒有任何紀錄</p>
+        <small>填完今天後按儲存，就會出現在這裡</small>
+      </div>`;
+    return;
+  }
+  const done = dates.filter(d=>isComplete(entries[d])).length;
+  const cards = dates.map(date => {
+    const e = entries[date];
+    const isToday = date === todayKey;
+    const complete = isComplete(e);
+    return `
+      <button class="entry-card${isToday?" today-card":""}" onclick="openDetail('${date}')">
+        <div>
+          <div class="entry-date">${isToday?"今天 · ":""}${formatDate(date)}</div>
+          <div class="entry-stats">
+            ${e.events.filter(v=>v.trim()).length}/3 件事 ·
+            ${e.thanks.filter(v=>v.trim()).length}/2 感謝
+            ${e.tomorrow?.trim()?" · 目標 ✓":""}
+          </div>
+        </div>
+        <div class="entry-star${complete?" done":""}">${complete?"✦":"○"}</div>
+      </button>`;
+  }).join("");
+  document.getElementById("view-history").innerHTML = `
+    <div class="history-meta"><span>共 ${dates.length} 天</span><span>完整 ${done} 天</span></div>
+    ${cards}`;
+}
+
+function openDetail(date) {
+  document.getElementById("view-history").style.display = "none";
+  const e = entries[date];
+  const c3="#ffc364", c2="#e06c9f", c1="#6c9fe0";
+  const items = (arr, color) => {
+    const filled = arr.filter(v=>v?.trim());
+    return filled.length > 0
+      ? filled.map(item=>`<div class="detail-item" style="border-left:2px solid ${color}35">${esc(item)}</div>`).join("")
+      : `<div class="detail-empty">未填寫</div>`;
+  };
+  document.getElementById("view-detail").innerHTML = `
+    <button class="back-btn" onclick="backToHistory()">← 返回列表</button>
+    <div class="detail-date">${formatDate(date)}</div>
+    <div class="detail-section">
+      <div class="detail-header">
+        <div class="detail-num" style="background:${c3}15;border:1px solid ${c3}35;color:${c3}">3</div>
+        <span class="detail-label">那天發生的事</span>
+      </div>
+      ${items(e.events, c3)}
+    </div>
+    <div class="detail-section">
+      <div class="detail-header">
+        <div class="detail-num" style="background:${c2}15;border:1px solid ${c2}35;color:${c2}">2</div>
+        <span class="detail-label">感謝的事</span>
+      </div>
+      ${items(e.thanks, c2)}
+    </div>
+    <div class="detail-section">
+      <div class="detail-header">
+        <div class="detail-num" style="background:${c1}15;border:1px solid ${c1}35;color:${c1}">1</div>
+        <span class="detail-label">隔天想做的事</span>
+      </div>
+      ${items([e.tomorrow], c1)}
+    </div>
+    ${e.savedAt ? `<div class="detail-timestamp">儲存於 ${new Date(e.savedAt).toLocaleString("zh-TW")}</div>` : ""}
+  `;
+  document.getElementById("view-detail").style.display = "";
+}
+
+function backToHistory() {
+  document.getElementById("view-detail").style.display = "none";
+  document.getElementById("view-history").style.display = "";
+  renderHistory();
+}
+</script>
+</body>
+</html>
