@@ -77,16 +77,16 @@
   textarea:focus { outline: none; border-color: rgba(255,195,100,0.35); }
   textarea::placeholder { color: #3c3a50; }
 
-  #save-btn {
+  .save-btn {
     width: 100%; padding: 16px; margin-top: 4px;
     border: 1px solid rgba(255,195,100,0.25); border-radius: 14px;
     background: linear-gradient(135deg, rgba(255,195,100,0.12), rgba(224,108,159,0.12));
     color: #ffc364; font-size: 15px; font-family: inherit;
     cursor: pointer; font-weight: 600; letter-spacing: 0.04em; transition: all 0.3s;
   }
-  #save-btn.saved { border-color: rgba(100,200,130,0.3); background: rgba(100,200,130,0.12); color: #64c882; }
-  #save-btn.error { border-color: rgba(255,100,100,0.3); background: rgba(255,100,100,0.12); color: #ff6464; }
-  #save-btn:active { opacity: 0.75; }
+  .save-btn.saved { border-color: rgba(100,200,130,0.3); background: rgba(100,200,130,0.12); color: #64c882; }
+  .save-btn.error { border-color: rgba(255,100,100,0.3); background: rgba(255,100,100,0.12); color: #ff6464; }
+  .save-btn:active { opacity: 0.75; }
 
   .save-hint { text-align: center; margin-top: 10px; font-size: 12px; color: #3c3a50; }
   .saved-notice {
@@ -94,6 +94,25 @@
     background: rgba(100,200,130,0.08); border-radius: 10px;
     font-size: 12px; color: #64c882; border: 1px solid rgba(100,200,130,0.2);
   }
+  .edit-notice {
+    margin-bottom: 20px; padding: 10px 14px;
+    background: rgba(108,159,224,0.08); border-radius: 10px;
+    font-size: 12px; color: #6c9fe0; border: 1px solid rgba(108,159,224,0.2);
+  }
+
+  /* Date picker for new entry */
+  .date-picker-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+  }
+  .date-picker-row label { font-size: 12px; color: #7a768f; flex-shrink: 0; }
+  input[type="date"] {
+    flex: 1; background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07); border-radius: 10px;
+    padding: 10px 14px; color: #fffffe; font-size: 14px;
+    font-family: inherit; transition: border-color 0.2s;
+    color-scheme: dark;
+  }
+  input[type="date"]:focus { outline: none; border-color: rgba(255,195,100,0.35); }
 
   .history-meta { display: flex; justify-content: space-between; font-size: 12px; color: #4a4660; margin-bottom: 16px; }
   .history-empty { text-align: center; padding: 60px 20px; color: #4a4660; }
@@ -120,7 +139,17 @@
     background: none; border: none; color: #7a768f; cursor: pointer;
     font-size: 13px; font-family: inherit; margin-bottom: 20px; padding: 0;
   }
-  .detail-date { font-size: 14px; color: #a8a4c0; margin-bottom: 24px; }
+  .detail-header-row {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
+  }
+  .detail-date { font-size: 14px; color: #a8a4c0; }
+  .edit-btn {
+    background: rgba(255,195,100,0.1); border: 1px solid rgba(255,195,100,0.25);
+    border-radius: 8px; padding: 6px 12px; color: #ffc364;
+    font-size: 12px; font-family: inherit; cursor: pointer;
+  }
+  .edit-btn:active { opacity: 0.75; }
+
   .detail-section { margin-bottom: 22px; }
   .detail-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
   .detail-num {
@@ -136,6 +165,16 @@
   }
   .detail-empty { font-size: 13px; color: #3c3a50; font-style: italic; padding-left: 4px; }
   .detail-timestamp { font-size: 11px; color: #3c3a50; margin-top: 16px; }
+
+  /* New entry button */
+  .new-entry-btn {
+    width: 100%; padding: 14px; margin-bottom: 16px;
+    border: 1px dashed rgba(255,195,100,0.3); border-radius: 14px;
+    background: transparent; color: #ffc364;
+    font-size: 13px; font-family: inherit; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .new-entry-btn:active { opacity: 0.75; }
 </style>
 </head>
 <body>
@@ -158,6 +197,7 @@
   <div id="view-today"></div>
   <div id="view-history" style="display:none"></div>
   <div id="view-detail" style="display:none"></div>
+  <div id="view-edit" style="display:none"></div>
 </div>
 
 <script>
@@ -186,11 +226,24 @@ function saveData(data) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); return true; } catch { return false; }
 }
 
+function esc(str) {
+  return (str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function autoResize(el) {
+  el.style.height = "auto";
+  el.style.height = el.scrollHeight + "px";
+}
+
 const todayKey = getTodayKey();
 let entries = loadData();
 let draft = entries[todayKey]
   ? { ...entries[todayKey] }
   : { events: ["","",""], thanks: ["",""], tomorrow: "" };
+
+// edit mode state
+let editingDate = null;
+let editDraft = null;
 
 document.getElementById("today-label").textContent = formatDate(todayKey);
 updateStreak();
@@ -201,20 +254,20 @@ function updateStreak() {
   const done = Object.values(entries).filter(isComplete).length;
   document.getElementById("streak-label").textContent =
     count > 0 ? `已累積 ${count} 天紀錄 · 完整 ${done} 天 ✦` : "";
-  const allDates = Object.keys(entries);
   document.getElementById("nav-history").textContent =
-    `回顧${allDates.length > 0 ? ` (${allDates.length})` : ""}`;
+    `回顧${count > 0 ? ` (${count})` : ""}`;
 }
 
 function switchView(v) {
-  document.getElementById("view-today").style.display = v === "today" ? "" : "none";
-  document.getElementById("view-history").style.display = v === "history" ? "" : "none";
-  document.getElementById("view-detail").style.display = "none";
+  ["today","history","detail","edit"].forEach(name => {
+    document.getElementById("view-"+name).style.display = name === v ? "" : "none";
+  });
   document.getElementById("nav-today").className = v === "today" ? "active" : "";
   document.getElementById("nav-history").className = v === "history" ? "active" : "";
   if (v === "history") renderHistory();
 }
 
+// ── TODAY ──────────────────────────────────────
 function renderToday() {
   const already = entries[todayKey]?.savedAt;
   document.getElementById("view-today").innerHTML = `
@@ -227,7 +280,7 @@ function renderToday() {
       ${[0,1,2].map(i=>`
         <div class="input-row">
           <span class="input-idx">${i+1}</span>
-          <textarea id="event-${i}" placeholder="${["寫下第一件事…","寫下第二件事…","寫下第三件事…"][i]}" oninput="onDraft('event',${i},this.value);autoResize(this)">${esc(draft.events[i])}</textarea>
+          <textarea placeholder="${["寫下第一件事…","寫下第二件事…","寫下第三件事…"][i]}" oninput="onDraft('event',${i},this.value);autoResize(this)">${esc(draft.events[i])}</textarea>
         </div>`).join("")}
     </div>
     <div class="section">
@@ -238,7 +291,7 @@ function renderToday() {
       ${[0,1].map(i=>`
         <div class="input-row">
           <span class="input-idx">${i+1}</span>
-          <textarea id="thank-${i}" placeholder="${["感謝什麼…","還有什麼…"][i]}" oninput="onDraft('thank',${i},this.value);autoResize(this)">${esc(draft.thanks[i])}</textarea>
+          <textarea placeholder="${["感謝什麼…","還有什麼…"][i]}" oninput="onDraft('thank',${i},this.value);autoResize(this)">${esc(draft.thanks[i])}</textarea>
         </div>`).join("")}
     </div>
     <div class="section">
@@ -247,17 +300,13 @@ function renderToday() {
         <span class="section-label">明天想做的一件事</span>
       </div>
       <div class="input-row">
-        <textarea id="tomorrow" placeholder="一個小小的目標…" oninput="onDraft('tomorrow',null,this.value);autoResize(this)">${esc(draft.tomorrow)}</textarea>
+        <textarea placeholder="一個小小的目標…" oninput="onDraft('tomorrow',null,this.value);autoResize(this)">${esc(draft.tomorrow)}</textarea>
       </div>
     </div>
-    <button id="save-btn" onclick="handleSave()">儲存今天的紀錄</button>
+    <button class="save-btn" id="save-btn" onclick="handleSave()">儲存今天的紀錄</button>
     <p class="save-hint" id="save-hint">${isComplete(draft) ? "✦ 今日紀錄完整" : "尚有欄位未填寫"}</p>
   `;
-  document.querySelectorAll("textarea").forEach(t => autoResize(t));
-}
-
-function esc(str) {
-  return (str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  document.querySelectorAll("#view-today textarea").forEach(t => autoResize(t));
 }
 
 function onDraft(type, i, val) {
@@ -267,64 +316,58 @@ function onDraft(type, i, val) {
   document.getElementById("save-hint").textContent = isComplete(draft) ? "✦ 今日紀錄完整" : "尚有欄位未填寫";
 }
 
-function autoResize(el) {
-  el.style.height = "auto";
-  el.style.height = el.scrollHeight + "px";
-}
-
 function handleSave() {
   const btn = document.getElementById("save-btn");
-  btn.disabled = true;
-  btn.textContent = "儲存中…";
-  btn.className = "";
+  btn.disabled = true; btn.textContent = "儲存中…"; btn.className = "save-btn";
   entries[todayKey] = { ...draft, savedAt: new Date().toISOString() };
   const ok = saveData(entries);
   if (ok) {
-    btn.className = "saved";
-    btn.textContent = "✓ 已儲存";
+    btn.className = "save-btn saved"; btn.textContent = "✓ 已儲存";
     updateStreak();
-    setTimeout(() => { btn.disabled = false; btn.className = ""; btn.textContent = "儲存今天的紀錄"; }, 2500);
+    setTimeout(() => { btn.disabled = false; btn.className = "save-btn"; btn.textContent = "儲存今天的紀錄"; }, 2500);
   } else {
-    btn.className = "error";
-    btn.textContent = "儲存失敗，請再試";
-    setTimeout(() => { btn.disabled = false; btn.className = ""; btn.textContent = "儲存今天的紀錄"; }, 3000);
+    btn.className = "save-btn error"; btn.textContent = "儲存失敗，請再試";
+    setTimeout(() => { btn.disabled = false; btn.className = "save-btn"; btn.textContent = "儲存今天的紀錄"; }, 3000);
   }
 }
 
+// ── HISTORY ────────────────────────────────────
 function renderHistory() {
   const dates = Object.keys(entries).sort((a,b)=>b.localeCompare(a));
-  if (dates.length === 0) {
-    document.getElementById("view-history").innerHTML = `
-      <div class="history-empty">
-        <div class="moon">🌙</div>
-        <p>還沒有任何紀錄</p>
-        <small>填完今天後按儲存，就會出現在這裡</small>
-      </div>`;
-    return;
-  }
   const done = dates.filter(d=>isComplete(entries[d])).length;
-  const cards = dates.map(date => {
-    const e = entries[date];
-    const isToday = date === todayKey;
-    const complete = isComplete(e);
-    return `
-      <button class="entry-card${isToday?" today-card":""}" onclick="openDetail('${date}')">
-        <div>
-          <div class="entry-date">${isToday?"今天 · ":""}${formatDate(date)}</div>
-          <div class="entry-stats">
-            ${e.events.filter(v=>v.trim()).length}/3 件事 ·
-            ${e.thanks.filter(v=>v.trim()).length}/2 感謝
-            ${e.tomorrow?.trim()?" · 目標 ✓":""}
+
+  let html = `<button class="new-entry-btn" onclick="openNewEntry()">＋ 補寫其他日期的紀錄</button>`;
+
+  if (dates.length === 0) {
+    html += `<div class="history-empty">
+      <div class="moon">🌙</div>
+      <p>還沒有任何紀錄</p>
+      <small>填完今天後按儲存，就會出現在這裡</small>
+    </div>`;
+  } else {
+    html += `<div class="history-meta"><span>共 ${dates.length} 天</span><span>完整 ${done} 天</span></div>`;
+    html += dates.map(date => {
+      const e = entries[date];
+      const isToday = date === todayKey;
+      const complete = isComplete(e);
+      return `
+        <button class="entry-card${isToday?" today-card":""}" onclick="openDetail('${date}')">
+          <div>
+            <div class="entry-date">${isToday?"今天 · ":""}${formatDate(date)}</div>
+            <div class="entry-stats">
+              ${e.events.filter(v=>v.trim()).length}/3 件事 ·
+              ${e.thanks.filter(v=>v.trim()).length}/2 感謝
+              ${e.tomorrow?.trim()?" · 目標 ✓":""}
+            </div>
           </div>
-        </div>
-        <div class="entry-star${complete?" done":""}">${complete?"✦":"○"}</div>
-      </button>`;
-  }).join("");
-  document.getElementById("view-history").innerHTML = `
-    <div class="history-meta"><span>共 ${dates.length} 天</span><span>完整 ${done} 天</span></div>
-    ${cards}`;
+          <div class="entry-star${complete?" done":""}">${complete?"✦":"○"}</div>
+        </button>`;
+    }).join("");
+  }
+  document.getElementById("view-history").innerHTML = html;
 }
 
+// ── DETAIL ─────────────────────────────────────
 function openDetail(date) {
   document.getElementById("view-history").style.display = "none";
   const e = entries[date];
@@ -337,7 +380,10 @@ function openDetail(date) {
   };
   document.getElementById("view-detail").innerHTML = `
     <button class="back-btn" onclick="backToHistory()">← 返回列表</button>
-    <div class="detail-date">${formatDate(date)}</div>
+    <div class="detail-header-row">
+      <div class="detail-date">${formatDate(date)}</div>
+      <button class="edit-btn" onclick="openEdit('${date}')">✎ 編輯</button>
+    </div>
     <div class="detail-section">
       <div class="detail-header">
         <div class="detail-num" style="background:${c3}15;border:1px solid ${c3}35;color:${c3}">3</div>
@@ -368,6 +414,115 @@ function backToHistory() {
   document.getElementById("view-detail").style.display = "none";
   document.getElementById("view-history").style.display = "";
   renderHistory();
+}
+
+// ── EDIT ───────────────────────────────────────
+function openEdit(date) {
+  editingDate = date;
+  editDraft = entries[date]
+    ? { events:[...entries[date].events], thanks:[...entries[date].thanks], tomorrow: entries[date].tomorrow }
+    : { events:["","",""], thanks:["",""], tomorrow:"" };
+
+  document.getElementById("view-detail").style.display = "none";
+  renderEditView(false);
+  document.getElementById("view-edit").style.display = "";
+}
+
+function openNewEntry() {
+  editingDate = null;
+  editDraft = { events:["","",""], thanks:["",""], tomorrow:"" };
+  renderEditView(true);
+  document.getElementById("view-history").style.display = "none";
+  document.getElementById("view-edit").style.display = "";
+}
+
+function renderEditView(isNew) {
+  const dateVal = editingDate || todayKey;
+  document.getElementById("view-edit").innerHTML = `
+    <button class="back-btn" onclick="cancelEdit(${isNew})"">← 取消</button>
+    <div class="edit-notice">${isNew ? "📝 補寫過去的紀錄" : "✎ 編輯這天的紀錄"}</div>
+    ${isNew ? `
+      <div class="date-picker-row">
+        <label>選擇日期</label>
+        <input type="date" id="edit-date" value="${dateVal}" max="${todayKey}" onchange="editingDate=this.value" />
+      </div>` : `<div style="font-size:13px;color:#a8a4c0;margin-bottom:20px">${formatDate(editingDate)}</div>`}
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num" style="background:rgba(255,195,100,0.15);border:1px solid rgba(255,195,100,0.35);color:#ffc364">3</div>
+        <span class="section-label">那天發生的事</span>
+      </div>
+      ${[0,1,2].map(i=>`
+        <div class="input-row">
+          <span class="input-idx">${i+1}</span>
+          <textarea placeholder="${["第一件事…","第二件事…","第三件事…"][i]}" oninput="onEditDraft('event',${i},this.value);autoResize(this)">${esc(editDraft.events[i])}</textarea>
+        </div>`).join("")}
+    </div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num" style="background:rgba(224,108,159,0.15);border:1px solid rgba(224,108,159,0.35);color:#e06c9f">2</div>
+        <span class="section-label">感謝的事</span>
+      </div>
+      ${[0,1].map(i=>`
+        <div class="input-row">
+          <span class="input-idx">${i+1}</span>
+          <textarea placeholder="${["感謝什麼…","還有什麼…"][i]}" oninput="onEditDraft('thank',${i},this.value);autoResize(this)">${esc(editDraft.thanks[i])}</textarea>
+        </div>`).join("")}
+    </div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num" style="background:rgba(108,159,224,0.15);border:1px solid rgba(108,159,224,0.35);color:#6c9fe0">1</div>
+        <span class="section-label">隔天想做的事</span>
+      </div>
+      <div class="input-row">
+        <textarea placeholder="一個小小的目標…" oninput="onEditDraft('tomorrow',null,this.value);autoResize(this)">${esc(editDraft.tomorrow)}</textarea>
+      </div>
+    </div>
+    <button class="save-btn" id="edit-save-btn" onclick="handleEditSave(${isNew})">儲存</button>
+  `;
+  document.querySelectorAll("#view-edit textarea").forEach(t => autoResize(t));
+}
+
+function onEditDraft(type, i, val) {
+  if (type === "event") editDraft.events[i] = val;
+  else if (type === "thank") editDraft.thanks[i] = val;
+  else editDraft.tomorrow = val;
+}
+
+function handleEditSave(isNew) {
+  const btn = document.getElementById("edit-save-btn");
+  if (isNew) {
+    const dateInput = document.getElementById("edit-date");
+    editingDate = dateInput ? dateInput.value : todayKey;
+  }
+  if (!editingDate) return;
+  btn.disabled = true; btn.textContent = "儲存中…";
+  entries[editingDate] = { ...editDraft, savedAt: new Date().toISOString() };
+  // if editing today, also update draft
+  if (editingDate === todayKey) draft = { ...editDraft };
+  const ok = saveData(entries);
+  if (ok) {
+    btn.className = "save-btn saved"; btn.textContent = "✓ 已儲存";
+    updateStreak();
+    if (editingDate === todayKey) renderToday();
+    setTimeout(() => {
+      document.getElementById("view-edit").style.display = "none";
+      document.getElementById("view-history").style.display = "";
+      renderHistory();
+    }, 1200);
+  } else {
+    btn.className = "save-btn error"; btn.textContent = "儲存失敗，請再試";
+    setTimeout(() => { btn.disabled = false; btn.className = "save-btn"; btn.textContent = "儲存"; }, 3000);
+  }
+}
+
+function cancelEdit(isNew) {
+  document.getElementById("view-edit").style.display = "none";
+  if (isNew) {
+    document.getElementById("view-history").style.display = "";
+    renderHistory();
+  } else {
+    openDetail(editingDate);
+  }
 }
 </script>
 </body>
