@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8" />
@@ -21,6 +22,7 @@ const manifestData = {
 const blob = new Blob([JSON.stringify(manifestData)], {type:"application/json"});
 document.write('<link rel="manifest" href="' + URL.createObjectURL(blob) + '">');
 </script>
+
 <meta name="theme-color" content="#0d0c14" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -209,6 +211,7 @@ document.write('<link rel="manifest" href="' + URL.createObjectURL(blob) + '">')
   }
   .toast.show { opacity: 1; }
 </style>
+
 </head>
 <body>
 <div class="bg-grad"></div>
@@ -282,6 +285,7 @@ function updateStreak() {
 }
 
 function switchView(v) {
+  if (v !== 'history') { searchQuery = ""; document.getElementById('view-history').innerHTML = ''; }
   ["today","history","detail","edit"].forEach(n => {
     document.getElementById("view-"+n).style.display = n===v ? "" : "none";
   });
@@ -301,298 +305,267 @@ function renderToday() {
       </div>
       ${[0,1,2].map(i=>`<div class="input-row"><span class="input-idx">${i+1}</span>
         <textarea placeholder="${["寫下第一件事…","寫下第二件事…","寫下第三件事…"][i]}"
-          oninput="onDraft('event',${i},this.value);autoResize(this);scheduleAutoSave('today')">${esc(draft.events[i])}</textarea></div>`).join("")}
-    </div>
-    <div class="section">
-      <div class="section-header">
-        <div class="section-num" style="background:rgba(224,108,159,0.15);border:1px solid rgba(224,108,159,0.35);color:#e06c9f">2</div>
-        <span class="section-label">今天感謝的事</span>
-      </div>
-      ${[0,1].map(i=>`<div class="input-row"><span class="input-idx">${i+1}</span>
-        <textarea placeholder="${["感謝什麼…","還有什麼…"][i]}"
-          oninput="onDraft('thank',${i},this.value);autoResize(this);scheduleAutoSave('today')">${esc(draft.thanks[i])}</textarea></div>`).join("")}
-    </div>
-    <div class="section">
-      <div class="section-header">
-        <div class="section-num" style="background:rgba(108,159,224,0.15);border:1px solid rgba(108,159,224,0.35);color:#6c9fe0">1</div>
-        <span class="section-label">明天想做的一件事</span>
-      </div>
-      <div class="input-row">
-        <textarea placeholder="一個小小的目標…"
-          oninput="onDraft('tomorrow',null,this.value);autoResize(this);scheduleAutoSave('today')">${esc(draft.tomorrow)}</textarea>
-      </div>
-    </div>
-    <button class="save-btn" id="save-btn" onclick="handleSave()">儲存今天的紀錄</button>
-    <p class="autosave-hint" id="autosave-hint">${isComplete(draft) ? "✦ 今日紀錄完整" : "尚有欄位未填寫"}</p>`;
-  document.querySelectorAll("#view-today textarea").forEach(t => autoResize(t));
+          oninput="if(!this._c){onDraft('event',${i},this.value);autoResize(this);scheduleAutoSave('today')}" oncompositionstart="this._c=true" oncompositionend="this._c=false;onDraft('event',${i},this.value);scheduleAutoSave('today')">${esc(draft.events[i])}</textarea></div>`).join("")}
+
+```
+</div>
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:rgba(224,108,159,0.15);border:1px solid rgba(224,108,159,0.35);color:#e06c9f">2</div>
+    <span class="section-label">今天感謝的事</span>
+  </div>
+  ${[0,1].map(i=>`<div class="input-row"><span class="input-idx">${i+1}</span>
+    <textarea placeholder="${["感謝什麼…","還有什麼…"][i]}"
+      oninput="if(!this._c){onDraft('thank',${i},this.value);autoResize(this);scheduleAutoSave('today')}" oncompositionstart="this._c=true" oncompositionend="this._c=false;onDraft('thank',${i},this.value);scheduleAutoSave('today')">${esc(draft.thanks[i])}</textarea></div>`).join("")}
+</div>
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:rgba(108,159,224,0.15);border:1px solid rgba(108,159,224,0.35);color:#6c9fe0">1</div>
+    <span class="section-label">明天想做的一件事</span>
+  </div>
+  <div class="input-row">
+    <textarea placeholder="一個小小的目標…"
+      oninput="if(!this._c){onDraft('tomorrow',null,this.value);autoResize(this);scheduleAutoSave('today')}" oncompositionstart="this._c=true" oncompositionend="this._c=false;onDraft('tomorrow',null,this.value);scheduleAutoSave('today')">${esc(draft.tomorrow)}</textarea>
+  </div>
+</div>
+<button class="save-btn" id="save-btn" onclick="handleSave()">儲存今天的紀錄</button>
+<p class="autosave-hint" id="autosave-hint">${isComplete(draft) ? "✦ 今日紀錄完整" : "尚有欄位未填寫"}</p>`;
+```
+
+document.querySelectorAll(”#view-today textarea”).forEach(t => autoResize(t));
 }
 
 function onDraft(type, i, val) {
-  if (type==="event") draft.events[i]=val;
-  else if (type==="thank") draft.thanks[i]=val;
-  else draft.tomorrow=val;
-  const h = document.getElementById("autosave-hint");
-  if (h) h.textContent = isComplete(draft) ? "✦ 今日紀錄完整" : "尚有欄位未填寫";
+if (type===“event”) draft.events[i]=val;
+else if (type===“thank”) draft.thanks[i]=val;
+else draft.tomorrow=val;
+const h = document.getElementById(“autosave-hint”);
+if (h) h.textContent = isComplete(draft) ? “✦ 今日紀錄完整” : “尚有欄位未填寫”;
 }
 
 function handleSave(quiet=false) {
-  entries[todayKey] = { ...draft, savedAt: new Date().toISOString() };
-  const ok = saveData(entries);
-  if (!quiet) {
-    const btn = document.getElementById("save-btn"); if (!btn) return ok;
-    btn.disabled=true; btn.className="save-btn saved"; btn.textContent="✓ 已儲存";
-    updateStreak();
-    setTimeout(() => { btn.disabled=false; btn.className="save-btn"; btn.textContent="儲存今天的紀錄"; }, 2500);
-  } else { updateStreak(); }
-  return ok;
+entries[todayKey] = { …draft, savedAt: new Date().toISOString() };
+const ok = saveData(entries);
+if (!quiet) {
+const btn = document.getElementById(“save-btn”); if (!btn) return ok;
+btn.disabled=true; btn.className=“save-btn saved”; btn.textContent=“✓ 已儲存”;
+updateStreak();
+setTimeout(() => { btn.disabled=false; btn.className=“save-btn”; btn.textContent=“儲存今天的紀錄”; }, 2500);
+} else { updateStreak(); }
+return ok;
 }
 
 function scheduleAutoSave(mode) {
-  clearTimeout(autoSaveTimer);
-  autoSaveTimer = setTimeout(() => {
-    let ok = false;
-    if (mode==="today") { ok = handleSave(true); }
-    else if (mode==="edit" && editingDate) {
-      entries[editingDate] = { ...editDraft, savedAt: new Date().toISOString() };
-      ok = saveData(entries);
-      if (editingDate===todayKey) draft = { ...editDraft };
-      updateStreak();
-    }
-    if (ok) {
-      const hint = document.getElementById("autosave-hint") || document.getElementById("edit-autosave-hint");
-      if (hint) { hint.textContent="✓ 已自動儲存"; hint.classList.add("visible");
-        setTimeout(() => { hint.classList.remove("visible"); hint.textContent=""; }, 2000); }
-    }
-  }, 1500);
+clearTimeout(autoSaveTimer);
+autoSaveTimer = setTimeout(() => {
+let ok = false;
+if (mode===“today”) { ok = handleSave(true); }
+else if (mode===“edit” && editingDate) {
+const dateToSave = document.getElementById(‘edit-date’)?.value || editingDate;
+if (!dateToSave) return;
+editingDate = dateToSave;
+entries[editingDate] = { …editDraft, savedAt: new Date().toISOString() };
+ok = saveData(entries);
+if (editingDate===todayKey) draft = { …editDraft };
+updateStreak();
+}
+if (ok) {
+const hint = document.getElementById(“autosave-hint”) || document.getElementById(“edit-autosave-hint”);
+if (hint) { hint.textContent=“✓ 已自動儲存”; hint.classList.add(“visible”);
+setTimeout(() => { hint.classList.remove(“visible”); hint.textContent=””; }, 2000); }
+}
+}, 1500);
 }
 
 function renderHistory() {
-  const allDates = Object.keys(entries).sort((a,b)=>b.localeCompare(a));
-  const filtered = searchQuery
-    ? allDates.filter(date => {
-        const e = entries[date];
-        return [...e.events, ...e.thanks, e.tomorrow, date].join(" ").toLowerCase().includes(searchQuery.toLowerCase());
-      })
-    : allDates;
-  const done = allDates.filter(d=>isComplete(entries[d])).length;
-  let html = `
-    <div class="backup-row">
-      <button class="backup-btn" onclick="exportBackup()">⬇ 備份資料</button>
-      <button class="backup-btn" onclick="document.getElementById('import-input').click()">⬆ 還原備份</button>
-      <input type="file" id="import-input" accept=".json" style="display:none" onchange="importBackup(event)" />
-    </div>
-    ${renderHeatmap()}
-    <div class="search-row">
-      <input class="search-input" type="text" placeholder="搜尋關鍵字…" value="${esc(searchQuery)}"
-        oninput="searchQuery=this.value;renderHistory()" />
-    </div>
-    <button class="new-entry-btn" onclick="openNewEntry()">＋ 補寫其他日期的紀錄</button>`;
-  if (allDates.length===0) {
-    html += `<div class="history-empty"><div class="moon">🌙</div><p>還沒有任何紀錄</p><small>填完今天後會出現在這裡</small></div>`;
-  } else if (filtered.length===0) {
-    html += `<div class="no-results">找不到「${esc(searchQuery)}」的相關紀錄</div>`;
-  } else {
-    html += `<div class="history-meta"><span>共 ${allDates.length} 天</span><span>完整 ${done} 天</span></div>`;
-    html += filtered.map(date => {
-      const e=entries[date]; const isToday=date===todayKey; const complete=isComplete(e);
-      return `<button class="entry-card${isToday?" today-card":""}" onclick="openDetail('${date}')">
-        <div>
-          <div class="entry-date">${isToday?"今天 · ":""}${formatDate(date)}</div>
-          <div class="entry-stats">${e.events.filter(v=>v.trim()).length}/3 件事 · ${e.thanks.filter(v=>v.trim()).length}/2 感謝${e.tomorrow?.trim()?" · 目標 ✓":""}</div>
-        </div>
-        <div class="entry-star${complete?" done":""}">${complete?"✦":"○"}</div>
-      </button>`;
-    }).join("");
-  }
-  document.getElementById("view-history").innerHTML = html;
+// Only rebuild the shell if not already rendered
+const existing = document.getElementById(“history-list”);
+if (!existing) {
+document.getElementById(“view-history”).innerHTML = ` <div class="backup-row"> <button class="backup-btn" onclick="exportBackup()">⬇ 備份資料</button> <button class="backup-btn" onclick="document.getElementById('import-input').click()">⬆ 還原備份</button> <input type="file" id="import-input" accept=".json" style="display:none" onchange="importBackup(event)" /> </div> ${renderHeatmap()} <div class="search-row"> <input class="search-input" id="search-input" type="text" placeholder="搜尋關鍵字…" oninput="if(!this._composing){searchQuery=this.value;renderHistoryList()}" oncompositionstart="this._composing=true" oncompositionend="this._composing=false;searchQuery=this.value;renderHistoryList()" /> </div> <button class="new-entry-btn" onclick="openNewEntry()">＋ 補寫其他日期的紀錄</button> <div id="history-list"></div>`;
+} else {
+// Refresh heatmap only
+const heatmapEl = document.getElementById(“heatmap-container”);
+if (heatmapEl) heatmapEl.outerHTML = renderHeatmap();
+}
+renderHistoryList();
+}
+
+function renderHistoryList() {
+const listEl = document.getElementById(“history-list”);
+if (!listEl) return;
+const allDates = Object.keys(entries).sort((a,b)=>b.localeCompare(a));
+const filtered = searchQuery
+? allDates.filter(date => {
+const e = entries[date];
+return […e.events, …e.thanks, e.tomorrow, date].join(” “).toLowerCase().includes(searchQuery.toLowerCase());
+})
+: allDates;
+const done = allDates.filter(d=>isComplete(entries[d])).length;
+let html = “”;
+if (allDates.length===0) {
+html = `<div class="history-empty"><div class="moon">🌙</div><p>還沒有任何紀錄</p><small>填完今天後會出現在這裡</small></div>`;
+} else if (filtered.length===0) {
+html = `<div class="no-results">找不到「${esc(searchQuery)}」的相關紀錄</div>`;
+} else {
+html += `<div class="history-meta"><span>共 ${allDates.length} 天</span><span>完整 ${done} 天</span></div>`;
+html += filtered.map(date => {
+const e=entries[date]; const isToday=date===todayKey; const complete=isComplete(e);
+return `<button class="entry-card${isToday?" today-card":""}" onclick="openDetail('${date}')"> <div> <div class="entry-date">${isToday?"今天 · ":""}${formatDate(date)}</div> <div class="entry-stats">${e.events.filter(v=>v.trim()).length}/3 件事 · ${e.thanks.filter(v=>v.trim()).length}/2 感謝${e.tomorrow?.trim()?" · 目標 ✓":""}</div> </div> <div class="entry-star${complete?" done":""}">${complete?"✦":"○"}</div> </button>`;
+}).join(””);
+}
+listEl.innerHTML = html;
 }
 
 function renderHeatmap() {
-  const today = new Date(); const cells = [];
-  for (let i=90; i>=0; i--) {
-    const d = new Date(today); d.setDate(d.getDate()-i);
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-    const e = entries[key];
-    const cls = e ? (isComplete(e) ? "heatmap-cell complete" : "heatmap-cell has-entry") : "heatmap-cell";
-    cells.push(`<div class="${cls}" title="${formatDate(key)}"></div>`);
-  }
-  return `<div class="heatmap-wrap">
-    <div class="heatmap-label">最近 3 個月紀錄</div>
-    <div class="heatmap-grid">${cells.join("")}</div>
-    <div style="display:flex;gap:8px;margin-top:6px;align-items:center;font-size:10px;color:#4a4660">
-      <div style="width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,0.05)"></div>無紀錄
-      <div style="width:10px;height:10px;border-radius:2px;background:rgba(255,195,100,0.5)"></div>部分填寫
-      <div style="width:10px;height:10px;border-radius:2px;background:#ffc364"></div>完整紀錄
-    </div>
+const today = new Date(); const cells = [];
+for (let i=90; i>=0; i–) {
+const d = new Date(today); d.setDate(d.getDate()-i);
+const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const e = entries[key];
+const cls = e ? (isComplete(e) ? “heatmap-cell complete” : “heatmap-cell has-entry”) : “heatmap-cell”;
+cells.push(`<div class="${cls}" title="${formatDate(key)}"></div>`);
+}
+return `<div class="heatmap-wrap">
+<div class="heatmap-label">最近 3 個月紀錄</div>
+<div class="heatmap-grid">${cells.join(””)}</div>
+<div style="display:flex;gap:8px;margin-top:6px;align-items:center;font-size:10px;color:#4a4660">
+<div style="width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,0.05)"></div>無紀錄
+<div style="width:10px;height:10px;border-radius:2px;background:rgba(255,195,100,0.5)"></div>部分填寫
+<div style="width:10px;height:10px;border-radius:2px;background:#ffc364"></div>完整紀錄
+</div>
+
   </div>`;
 }
 
 function exportBackup() {
-  const dateStr = getTodayKey();
-  const blob = new Blob([JSON.stringify(entries, null, 2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob); const a = document.createElement("a");
-  a.href=url; a.download=`321_backup_${dateStr}.json`; a.click(); URL.revokeObjectURL(url);
-  showToast("✓ 備份已下載");
+const dateStr = getTodayKey();
+const blob = new Blob([JSON.stringify(entries, null, 2)], {type:“application/json”});
+const url = URL.createObjectURL(blob); const a = document.createElement(“a”);
+a.href=url; a.download=`321_backup_${dateStr}.json`; a.click(); URL.revokeObjectURL(url);
+showToast(“✓ 備份已下載”);
 }
 
 function importBackup(event) {
-  const file = event.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (typeof data!=="object"||Array.isArray(data)) throw new Error();
-      const keys = Object.keys(data);
-      if (keys.length>0 && !keys[0].match(/^\d{4}-\d{2}-\d{2}$/)) throw new Error();
-      for (const k of keys) {
-        const v=data[k];
-        if (!v.events||!Array.isArray(v.events)||!v.thanks||typeof v.tomorrow==="undefined") throw new Error();
-      }
-      if (!confirm(`確定要還原備份嗎？這將合併 ${keys.length} 筆紀錄。`)) return;
-      entries = { ...entries, ...data };
-      saveData(entries);
-      draft = entries[todayKey]
-        ? { events:[...entries[todayKey].events], thanks:[...entries[todayKey].thanks], tomorrow: entries[todayKey].tomorrow }
-        : { events:["","",""], thanks:["",""], tomorrow:"" };
-      updateStreak(); renderHistory(); renderToday();
-      showToast(`✓ 成功還原 ${keys.length} 筆紀錄`);
-    } catch { showToast("✗ 備份格式有誤，無法還原"); }
-    event.target.value = "";
-  };
-  reader.readAsText(file);
+const file = event.target.files[0]; if (!file) return;
+const reader = new FileReader();
+reader.onload = (e) => {
+try {
+const data = JSON.parse(e.target.result);
+if (typeof data!==“object”||Array.isArray(data)) throw new Error();
+const keys = Object.keys(data);
+if (keys.length>0 && !keys[0].match(/^\d{4}-\d{2}-\d{2}$/)) throw new Error();
+for (const k of keys) {
+const v=data[k];
+if (!v.events||!Array.isArray(v.events)||!v.thanks||typeof v.tomorrow===“undefined”) throw new Error();
+}
+if (!confirm(`確定要還原備份嗎？這將合併 ${keys.length} 筆紀錄。`)) return;
+entries = { …entries, …data };
+saveData(entries);
+draft = entries[todayKey]
+? { events:[…entries[todayKey].events], thanks:[…entries[todayKey].thanks], tomorrow: entries[todayKey].tomorrow }
+: { events:[””,””,””], thanks:[””,””], tomorrow:”” };
+updateStreak(); renderHistory(); renderToday();
+showToast(`✓ 成功還原 ${keys.length} 筆紀錄`);
+} catch { showToast(“✗ 備份格式有誤，無法還原”); }
+event.target.value = “”;
+};
+reader.readAsText(file);
 }
 
 function openDetail(date) {
-  document.getElementById("view-history").style.display = "none";
-  document.getElementById("view-detail").style.display = "";
-  renderDetail(date, false);
+document.getElementById(“view-history”).style.display = “none”;
+document.getElementById(“view-detail”).style.display = “”;
+renderDetail(date, false);
 }
 
 function renderDetail(date, showDeleteConfirm) {
-  const e=entries[date]; const c3="#ffc364",c2="#e06c9f",c1="#6c9fe0";
-  const items = (arr, color) => {
-    const filled = arr.filter(v=>v?.trim());
-    return filled.length>0
-      ? filled.map(item=>`<div class="detail-item" style="border-left:2px solid ${color}35">${esc(item)}</div>`).join("")
-      : `<div class="detail-empty">未填寫</div>`;
-  };
-  document.getElementById("view-detail").innerHTML = `
-    <button class="back-btn" onclick="backToHistory()">← 返回列表</button>
-    <div class="detail-header-row">
-      <div class="detail-date">${formatDate(date)}</div>
-      <div class="detail-actions">
-        <button class="edit-btn" onclick="openEdit('${date}')">✎ 編輯</button>
-        <button class="delete-btn" onclick="renderDetail('${date}',true)">刪除</button>
-      </div>
-    </div>
-    <div class="detail-section"><div class="detail-header">
-      <div class="detail-num" style="background:${c3}15;border:1px solid ${c3}35;color:${c3}">3</div>
-      <span class="detail-label">那天發生的事</span></div>${items(e.events,c3)}</div>
-    <div class="detail-section"><div class="detail-header">
-      <div class="detail-num" style="background:${c2}15;border:1px solid ${c2}35;color:${c2}">2</div>
-      <span class="detail-label">感謝的事</span></div>${items(e.thanks,c2)}</div>
-    <div class="detail-section"><div class="detail-header">
-      <div class="detail-num" style="background:${c1}15;border:1px solid ${c1}35;color:${c1}">1</div>
-      <span class="detail-label">隔天想做的事</span></div>${items([e.tomorrow],c1)}</div>
-    ${e.savedAt ? `<div class="detail-timestamp">儲存於 ${new Date(e.savedAt).toLocaleString("zh-TW")}</div>` : ""}
-    ${showDeleteConfirm ? `<div class="delete-confirm">
-      <p>確定要刪除這天的紀錄嗎？此操作無法復原。</p>
-      <div class="delete-confirm-btns">
-        <button class="delete-confirm-yes" onclick="deleteEntry('${date}')">確定刪除</button>
-        <button class="delete-confirm-no" onclick="renderDetail('${date}',false)">取消</button>
-      </div></div>` : ""}`;
+const e=entries[date]; const c3=”#ffc364”,c2=”#e06c9f”,c1=”#6c9fe0”;
+const items = (arr, color) => {
+const filled = arr.filter(v=>v?.trim());
+return filled.length>0
+? filled.map(item=>`<div class="detail-item" style="border-left:2px solid ${color}35">${esc(item)}</div>`).join(””)
+: `<div class="detail-empty">未填寫</div>`;
+};
+document.getElementById(“view-detail”).innerHTML = `<button class="back-btn" onclick="backToHistory()">← 返回列表</button> <div class="detail-header-row"> <div class="detail-date">${formatDate(date)}</div> <div class="detail-actions"> <button class="edit-btn" onclick="openEdit('${date}')">✎ 編輯</button> <button class="delete-btn" onclick="renderDetail('${date}',true)">刪除</button> </div> </div> <div class="detail-section"><div class="detail-header"> <div class="detail-num" style="background:${c3}15;border:1px solid ${c3}35;color:${c3}">3</div> <span class="detail-label">那天發生的事</span></div>${items(e.events,c3)}</div> <div class="detail-section"><div class="detail-header"> <div class="detail-num" style="background:${c2}15;border:1px solid ${c2}35;color:${c2}">2</div> <span class="detail-label">感謝的事</span></div>${items(e.thanks,c2)}</div> <div class="detail-section"><div class="detail-header"> <div class="detail-num" style="background:${c1}15;border:1px solid ${c1}35;color:${c1}">1</div> <span class="detail-label">隔天想做的事</span></div>${items([e.tomorrow],c1)}</div> ${e.savedAt ?`<div class="detail-timestamp">儲存於 ${new Date(e.savedAt).toLocaleString(“zh-TW”)}</div>`: ""} ${showDeleteConfirm ?`<div class="delete-confirm">
+<p>確定要刪除這天的紀錄嗎？此操作無法復原。</p>
+<div class="delete-confirm-btns">
+<button class="delete-confirm-yes" onclick="deleteEntry('${date}')">確定刪除</button>
+<button class="delete-confirm-no" onclick="renderDetail('${date}',false)">取消</button>
+</div></div>` : ""}`;
 }
 
 function deleteEntry(date) {
-  delete entries[date]; saveData(entries);
-  if (date===todayKey) draft = { events:["","",""], thanks:["",""], tomorrow:"" };
-  updateStreak(); renderToday(); backToHistory(); showToast("已刪除此日紀錄");
+delete entries[date]; saveData(entries);
+if (date===todayKey) draft = { events:[””,””,””], thanks:[””,””], tomorrow:”” };
+updateStreak(); renderToday(); backToHistory(); showToast(“已刪除此日紀錄”);
 }
 
 function backToHistory() {
-  document.getElementById("view-detail").style.display = "none";
-  document.getElementById("view-history").style.display = ""; renderHistory();
+document.getElementById(“view-detail”).style.display = “none”;
+document.getElementById(“view-history”).style.display = “”;
+renderHistoryList();
 }
 
 function openEdit(date) {
-  editingDate=date;
-  editDraft = entries[date]
-    ? { events:[...entries[date].events], thanks:[...entries[date].thanks], tomorrow: entries[date].tomorrow }
-    : { events:["","",""], thanks:["",""], tomorrow:"" };
-  document.getElementById("view-detail").style.display = "none";
-  renderEditView(false); document.getElementById("view-edit").style.display = "";
+editingDate=date;
+editDraft = entries[date]
+? { events:[…entries[date].events], thanks:[…entries[date].thanks], tomorrow: entries[date].tomorrow }
+: { events:[””,””,””], thanks:[””,””], tomorrow:”” };
+document.getElementById(“view-detail”).style.display = “none”;
+renderEditView(false); document.getElementById(“view-edit”).style.display = “”;
 }
 
 function openNewEntry() {
-  editingDate=null; editDraft={ events:["","",""], thanks:["",""], tomorrow:"" };
-  renderEditView(true);
-  document.getElementById("view-history").style.display = "none";
-  document.getElementById("view-edit").style.display = "";
+editingDate=null; editDraft={ events:[””,””,””], thanks:[””,””], tomorrow:”” };
+renderEditView(true);
+document.getElementById(“view-history”).style.display = “none”;
+document.getElementById(“view-edit”).style.display = “”;
 }
 
 function renderEditView(isNew) {
-  const dateVal = editingDate||todayKey;
-  document.getElementById("view-edit").innerHTML = `
-    <button class="back-btn" onclick="cancelEdit(${isNew})">← 取消</button>
-    <div class="edit-notice">${isNew?"📝 補寫過去的紀錄":"✎ 編輯這天的紀錄"}</div>
-    ${isNew?`<div class="date-picker-row"><label>選擇日期</label>
-      <input type="date" id="edit-date" value="${dateVal}" max="${todayKey}" onchange="editingDate=this.value" /></div>`
-      :`<div style="font-size:13px;color:#a8a4c0;margin-bottom:20px">${formatDate(editingDate)}</div>`}
-    <div class="section"><div class="section-header">
-      <div class="section-num" style="background:rgba(255,195,100,0.15);border:1px solid rgba(255,195,100,0.35);color:#ffc364">3</div>
-      <span class="section-label">那天發生的事</span></div>
-      ${[0,1,2].map(i=>`<div class="input-row"><span class="input-idx">${i+1}</span>
-        <textarea placeholder="${["第一件事…","第二件事…","第三件事…"][i]}"
-          oninput="onEditDraft('event',${i},this.value);autoResize(this);scheduleAutoSave('edit')">${esc(editDraft.events[i])}</textarea></div>`).join("")}
-    </div>
-    <div class="section"><div class="section-header">
-      <div class="section-num" style="background:rgba(224,108,159,0.15);border:1px solid rgba(224,108,159,0.35);color:#e06c9f">2</div>
-      <span class="section-label">感謝的事</span></div>
-      ${[0,1].map(i=>`<div class="input-row"><span class="input-idx">${i+1}</span>
-        <textarea placeholder="${["感謝什麼…","還有什麼…"][i]}"
-          oninput="onEditDraft('thank',${i},this.value);autoResize(this);scheduleAutoSave('edit')">${esc(editDraft.thanks[i])}</textarea></div>`).join("")}
-    </div>
-    <div class="section"><div class="section-header">
-      <div class="section-num" style="background:rgba(108,159,224,0.15);border:1px solid rgba(108,159,224,0.35);color:#6c9fe0">1</div>
-      <span class="section-label">隔天想做的事</span></div>
-      <div class="input-row"><textarea placeholder="一個小小的目標…"
-        oninput="onEditDraft('tomorrow',null,this.value);autoResize(this);scheduleAutoSave('edit')">${esc(editDraft.tomorrow)}</textarea></div>
-    </div>
-    <button class="save-btn" id="edit-save-btn" onclick="handleEditSave(${isNew})">儲存</button>
-    <p class="autosave-hint" id="edit-autosave-hint"></p>`;
-  document.querySelectorAll("#view-edit textarea").forEach(t => autoResize(t));
+const dateVal = editingDate||todayKey;
+document.getElementById(“view-edit”).innerHTML = ` <button class="back-btn" onclick="cancelEdit(${isNew})">← 取消</button> <div class="edit-notice">${isNew?"📝 補寫過去的紀錄":"✎ 編輯這天的紀錄"}</div> ${isNew?`<div class="date-picker-row"><label>選擇日期</label>
+<input type="date" id="edit-date" value="${dateVal}" max="${todayKey}" onchange="editingDate=this.value" /></div>` :`<div style="font-size:13px;color:#a8a4c0;margin-bottom:20px">${formatDate(editingDate)}</div>`} <div class="section"><div class="section-header"> <div class="section-num" style="background:rgba(255,195,100,0.15);border:1px solid rgba(255,195,100,0.35);color:#ffc364">3</div> <span class="section-label">那天發生的事</span></div> ${[0,1,2].map(i=>`<div class="input-row"><span class="input-idx">${i+1}</span>
+<textarea placeholder=”${[“第一件事…”,“第二件事…”,“第三件事…”][i]}”
+oninput=“if(!this._c){onEditDraft(‘event’,${i},this.value);autoResize(this);scheduleAutoSave(‘edit’)}”
+oncompositionstart=“this._c=true” oncompositionend=“this._c=false;onEditDraft(‘event’,${i},this.value);scheduleAutoSave(‘edit’)”>${esc(editDraft.events[i])}</textarea></div>`).join("")} </div> <div class="section"><div class="section-header"> <div class="section-num" style="background:rgba(224,108,159,0.15);border:1px solid rgba(224,108,159,0.35);color:#e06c9f">2</div> <span class="section-label">感謝的事</span></div> ${[0,1].map(i=>`<div class="input-row"><span class="input-idx">${i+1}</span>
+<textarea placeholder=”${[“感謝什麼…”,“還有什麼…”][i]}”
+oninput=“if(!this._c){onEditDraft(‘thank’,${i},this.value);autoResize(this);scheduleAutoSave(‘edit’)}”
+oncompositionstart=“this._c=true” oncompositionend=“this._c=false;onEditDraft(‘thank’,${i},this.value);scheduleAutoSave(‘edit’)”>${esc(editDraft.thanks[i])}</textarea></div>`).join("")} </div> <div class="section"><div class="section-header"> <div class="section-num" style="background:rgba(108,159,224,0.15);border:1px solid rgba(108,159,224,0.35);color:#6c9fe0">1</div> <span class="section-label">隔天想做的事</span></div> <div class="input-row"><textarea placeholder="一個小小的目標…" oninput="if(!this._c){onEditDraft('tomorrow',null,this.value);autoResize(this);scheduleAutoSave('edit')}" oncompositionstart="this._c=true" oncompositionend="this._c=false;onEditDraft('tomorrow',null,this.value);scheduleAutoSave('edit')">${esc(editDraft.tomorrow)}</textarea></div> </div> <button class="save-btn" id="edit-save-btn" onclick="handleEditSave(${isNew})">儲存</button> <p class="autosave-hint" id="edit-autosave-hint"></p>`;
+document.querySelectorAll(”#view-edit textarea”).forEach(t => autoResize(t));
 }
 
 function onEditDraft(type, i, val) {
-  if (type==="event") editDraft.events[i]=val;
-  else if (type==="thank") editDraft.thanks[i]=val;
-  else editDraft.tomorrow=val;
+if (type===“event”) editDraft.events[i]=val;
+else if (type===“thank”) editDraft.thanks[i]=val;
+else editDraft.tomorrow=val;
 }
 
 function handleEditSave(isNew) {
-  const btn=document.getElementById("edit-save-btn");
-  if (isNew) { const d=document.getElementById("edit-date"); editingDate=d?d.value:todayKey; }
-  if (!editingDate) return;
-  btn.disabled=true; btn.textContent="儲存中…";
-  entries[editingDate]={ ...editDraft, savedAt: new Date().toISOString() };
-  if (editingDate===todayKey) draft={ ...editDraft };
-  const ok=saveData(entries);
-  if (ok) {
-    btn.className="save-btn saved"; btn.textContent="✓ 已儲存"; updateStreak();
-    setTimeout(() => { document.getElementById("view-edit").style.display="none";
-      document.getElementById("view-history").style.display=""; renderHistory(); }, 1000);
-  } else {
-    btn.className="save-btn error"; btn.textContent="儲存失敗，請再試";
-    setTimeout(()=>{ btn.disabled=false; btn.className="save-btn"; btn.textContent="儲存"; }, 3000);
-  }
+const btn=document.getElementById(“edit-save-btn”);
+if (isNew) { const d=document.getElementById(“edit-date”); editingDate=d?d.value:todayKey; }
+if (!editingDate) return;
+btn.disabled=true; btn.textContent=“儲存中…”;
+entries[editingDate]={ …editDraft, savedAt: new Date().toISOString() };
+if (editingDate===todayKey) draft={ …editDraft };
+const ok=saveData(entries);
+if (ok) {
+btn.className=“save-btn saved”; btn.textContent=“✓ 已儲存”; updateStreak();
+setTimeout(() => { document.getElementById(“view-edit”).style.display=“none”;
+document.getElementById(“view-history”).style.display=””; renderHistory(); }, 1000);
+} else {
+btn.className=“save-btn error”; btn.textContent=“儲存失敗，請再試”;
+setTimeout(()=>{ btn.disabled=false; btn.className=“save-btn”; btn.textContent=“儲存”; }, 3000);
+}
 }
 
 function cancelEdit(isNew) {
-  clearTimeout(autoSaveTimer);
-  document.getElementById("view-edit").style.display="none";
-  if (isNew) { document.getElementById("view-history").style.display=""; renderHistory(); }
-  else { openDetail(editingDate); }
+clearTimeout(autoSaveTimer);
+document.getElementById(“view-edit”).style.display=“none”;
+if (isNew) { document.getElementById(“view-history”).style.display=””; renderHistory(); }
+else { openDetail(editingDate); }
 }
 </script>
+
 </body>
 </html>
