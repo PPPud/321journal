@@ -10,242 +10,117 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="3·2·1" />
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  min-height: 100vh; background: #0d0c14;
-  font-family: -apple-system, 'PingFang TC', 'Microsoft JhengHei', Georgia, serif;
-  color: #fffffe; overflow-x: hidden;
-}
-.bg-grad {
-  position: fixed; inset: 0; pointer-events: none;
-  background: radial-gradient(ellipse at 15% 15%, #1c1538 0%, transparent 55%),
-              radial-gradient(ellipse at 85% 85%, #0b1c2e 0%, transparent 55%);
-}
-.bg-glow {
-  position: fixed; top: -100px; right: -60px; width: 280px; height: 280px;
-  border-radius: 50%; pointer-events: none;
-  background: radial-gradient(circle, rgba(255,195,100,0.07) 0%, transparent 70%);
-}
-.wrap { position: relative; max-width: 500px; margin: 0 auto; padding: 36px 20px 100px; }
-header { text-align: center; margin-bottom: 32px; }
-.eyebrow { font-size: 10px; letter-spacing: 0.4em; color: #7a768f; margin-bottom: 8px; text-transform: uppercase; }
-h1 {
-  font-size: 52px; font-weight: 700; letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #ffc364 0%, #ff8c6b 45%, #e06c9f 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-.date-label { font-size: 13px; color: #5c5875; margin-top: 6px; }
-.streak { font-size: 11px; color: #4a4660; margin-top: 4px; min-height: 16px; }
-nav {
-  display: flex; gap: 6px; margin-bottom: 28px;
-  background: rgba(255,255,255,0.04); border-radius: 12px; padding: 4px;
-}
-nav button {
-  flex: 1; padding: 10px 6px; border: none; border-radius: 9px;
-  font-size: 13px; font-family: inherit; cursor: pointer; font-weight: 400;
-  background: transparent; color: #5c5875; transition: all 0.2s;
-}
-nav button.active { background: rgba(255,195,100,0.14); color: #ffc364; font-weight: 600; }
-.section { margin-bottom: 28px; }
-.section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-.section-num {
-  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700;
-}
-.section-label { font-size: 12px; color: #7a768f; letter-spacing: 0.06em; }
-.input-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
-.input-idx { font-size: 11px; color: #3c3a50; padding-top: 14px; width: 12px; text-align: right; flex-shrink: 0; }
-textarea {
-  flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 10px; padding: 12px 14px; color: #fffffe; font-size: 14px;
-  font-family: inherit; resize: none; line-height: 1.65; transition: border-color 0.2s;
-  overflow: hidden; min-height: 44px;
-}
-textarea:focus { outline: none; border-color: rgba(255,195,100,0.35); }
-textarea::placeholder { color: #3c3a50; }
-.save-btn {
-  width: 100%; padding: 16px; margin-top: 4px;
-  border: 1px solid rgba(255,195,100,0.25); border-radius: 14px;
-  background: linear-gradient(135deg, rgba(255,195,100,0.12), rgba(224,108,159,0.12));
-  color: #ffc364; font-size: 15px; font-family: inherit;
-  cursor: pointer; font-weight: 600; letter-spacing: 0.04em; transition: all 0.3s;
-}
-.save-btn.saved { border-color: rgba(100,200,130,0.3); background: rgba(100,200,130,0.12); color: #64c882; }
-.save-btn.error { border-color: rgba(255,100,100,0.3); background: rgba(255,100,100,0.12); color: #ff6464; }
-.save-btn:active { opacity: 0.75; }
-.autosave-hint { text-align: center; margin-top: 8px; font-size: 11px; color: #3c3a50; min-height: 16px; transition: color 0.3s; }
-.autosave-hint.visible { color: #64c882; }
-.saved-notice {
-  margin-bottom: 20px; padding: 10px 14px; background: rgba(100,200,130,0.08);
-  border-radius: 10px; font-size: 12px; color: #64c882; border: 1px solid rgba(100,200,130,0.2);
-}
-.edit-notice {
-  margin-bottom: 20px; padding: 10px 14px; background: rgba(108,159,224,0.08);
-  border-radius: 10px; font-size: 12px; color: #6c9fe0; border: 1px solid rgba(108,159,224,0.2);
-}
-input[type="date"], .search-input {
-  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 10px; padding: 10px 14px; color: #fffffe; font-size: 14px;
-  font-family: inherit; transition: border-color 0.2s; color-scheme: dark; width: 100%;
-}
-input[type="date"]:focus, .search-input:focus { outline: none; border-color: rgba(255,195,100,0.35); }
-.search-input::placeholder { color: #3c3a50; }
-.date-picker-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-.date-picker-row label { font-size: 12px; color: #7a768f; flex-shrink: 0; }
-.search-row { margin-bottom: 16px; position: relative; }
-.search-row::before {
-  content: "🔍"; position: absolute; left: 12px; top: 50%;
-  transform: translateY(-50%); font-size: 13px; pointer-events: none;
-}
-.search-input { padding-left: 36px; }
-.heatmap-wrap { margin-bottom: 20px; }
-.heatmap-label { font-size: 11px; color: #4a4660; margin-bottom: 8px; }
-.heatmap-grid { display: flex; flex-wrap: wrap; gap: 3px; }
-.heatmap-cell { width: 12px; height: 12px; border-radius: 2px; background: rgba(255,255,255,0.05); }
-.heatmap-cell.has-entry { background: rgba(255,195,100,0.5); }
-.heatmap-cell.complete { background: #ffc364; }
-.history-meta { display: flex; justify-content: space-between; font-size: 12px; color: #4a4660; margin-bottom: 16px; }
-.history-empty { text-align: center; padding: 40px 20px; color: #4a4660; }
-.history-empty .moon { font-size: 32px; margin-bottom: 12px; }
-.history-empty p { font-size: 14px; }
-.history-empty small { font-size: 12px; color: #3a3650; margin-top: 6px; display: block; }
-.backup-row { display: flex; gap: 8px; margin-bottom: 16px; }
-.backup-btn {
-  flex: 1; padding: 10px; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
-  background: rgba(255,255,255,0.03); color: #a8a4c0; font-size: 12px;
-  font-family: inherit; cursor: pointer;
-}
-.backup-btn:active { opacity: 0.75; }
-.new-entry-btn {
-  width: 100%; padding: 14px; margin-bottom: 16px;
-  border: 1px dashed rgba(255,195,100,0.3); border-radius: 14px;
-  background: transparent; color: #ffc364; font-size: 13px; font-family: inherit; cursor: pointer;
-}
-.new-entry-btn:active { opacity: 0.75; }
-.entry-card {
-  width: 100%; text-align: left; padding: 16px 18px;
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 14px; cursor: pointer; font-family: inherit; color: #fffffe;
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
-}
-.entry-card.today-card { background: rgba(255,195,100,0.06); border-color: rgba(255,195,100,0.2); }
-.entry-card:active { opacity: 0.75; }
-.entry-date { font-size: 13px; color: #a8a4c0; margin-bottom: 4px; }
-.entry-card.today-card .entry-date { color: #ffc364; }
-.entry-stats { font-size: 11px; color: #4a4660; }
-.entry-star { font-size: 16px; color: #3c3a50; }
-.entry-star.done { color: #ffc364; }
-.no-results { text-align: center; padding: 30px; color: #4a4660; font-size: 13px; }
-.back-btn {
-  background: none; border: none; color: #7a768f; cursor: pointer;
-  font-size: 13px; font-family: inherit; margin-bottom: 20px; padding: 0;
-}
-.detail-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.detail-date { font-size: 14px; color: #a8a4c0; }
-.detail-actions { display: flex; gap: 8px; }
-.edit-btn {
-  background: rgba(255,195,100,0.1); border: 1px solid rgba(255,195,100,0.25);
-  border-radius: 8px; padding: 6px 12px; color: #ffc364; font-size: 12px; font-family: inherit; cursor: pointer;
-}
-.delete-btn {
-  background: rgba(255,80,80,0.08); border: 1px solid rgba(255,80,80,0.2);
-  border-radius: 8px; padding: 6px 12px; color: #ff6464; font-size: 12px; font-family: inherit; cursor: pointer;
-}
-.delete-confirm {
-  margin-top: 20px; padding: 16px; border-radius: 12px;
-  background: rgba(255,80,80,0.08); border: 1px solid rgba(255,80,80,0.2);
-}
-.delete-confirm p { font-size: 13px; color: #ff6464; margin-bottom: 12px; }
-.delete-confirm-btns { display: flex; gap: 8px; }
-.delete-confirm-yes {
-  flex: 1; padding: 10px; border: 1px solid rgba(255,80,80,0.3);
-  border-radius: 8px; background: rgba(255,80,80,0.15); color: #ff6464;
-  font-size: 13px; font-family: inherit; cursor: pointer;
-}
-.delete-confirm-no {
-  flex: 1; padding: 10px; border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px; background: rgba(255,255,255,0.04); color: #7a768f;
-  font-size: 13px; font-family: inherit; cursor: pointer;
-}
-.detail-section { margin-bottom: 22px; }
-.detail-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.detail-num {
-  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
-}
-.detail-label { font-size: 11px; color: #5c5875; }
-.detail-item {
-  padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 10px;
-  font-size: 14px; line-height: 1.7; color: #ccc8e4; margin-bottom: 6px;
-}
-.detail-empty { font-size: 13px; color: #3c3a50; font-style: italic; padding-left: 4px; }
-.detail-timestamp { font-size: 11px; color: #3c3a50; margin-top: 16px; }
-.toast {
-  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
-  background: rgba(30,28,50,0.95); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px; padding: 10px 20px; font-size: 13px; color: #fffffe;
-  opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; z-index: 999;
-}
-.toast.show { opacity: 1; }
-/* Insight */
-.insight-title {
-  font-size: 11px; letter-spacing: 0.1em; color: #7a768f; text-transform: uppercase;
-  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
-}
-.insight-title::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,0.06); }
-.insight-section { margin-bottom: 32px; }
-.insight-card {
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 14px; padding: 18px 20px; margin-bottom: 10px;
-}
-.insight-card p { font-size: 14px; line-height: 1.7; color: #ccc8e4; }
-.insight-card .meta { font-size: 11px; color: #4a4660; margin-bottom: 8px; }
-.period-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
-.period-tab {
-  padding: 6px 14px; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
-  background: transparent; color: #5c5875; font-size: 12px; font-family: inherit; cursor: pointer;
-}
-.period-tab.active { background: rgba(255,195,100,0.14); border-color: rgba(255,195,100,0.3); color: #ffc364; }
-.stat-row { display: flex; gap: 10px; margin-bottom: 10px; }
-.stat-box {
-  flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 12px; padding: 14px; text-align: center;
-}
-.stat-num { font-size: 28px; font-weight: 700; color: #ffc364; }
-.stat-label { font-size: 11px; color: #4a4660; margin-top: 4px; }
-.annual-box {
-  background: linear-gradient(135deg, rgba(255,195,100,0.08), rgba(224,108,159,0.08));
-  border: 1px solid rgba(255,195,100,0.15); border-radius: 14px; padding: 20px; margin-bottom: 10px;
-}
-.annual-num {
-  font-size: 36px; font-weight: 700;
-  background: linear-gradient(135deg, #ffc364, #e06c9f);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-.annual-label { font-size: 12px; color: #7a768f; margin-top: 4px; }
-.year-ago-card {
-  background: rgba(255,195,100,0.06); border: 1px solid rgba(255,195,100,0.2);
-  border-radius: 14px; padding: 16px 18px; margin-bottom: 28px;
-}
-.year-ago-label { font-size: 11px; color: #ffc364; margin-bottom: 10px; letter-spacing: 0.05em; }
-.year-ago-item {
-  font-size: 13px; color: #ccc8e4; line-height: 1.7; padding: 4px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.year-ago-item:last-child { border-bottom: none; }
-.wordcloud-wrap {
-  padding: 20px; background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07); border-radius: 14px;
-}
-.wordcloud-inner { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; min-height: 80px; }
-.wc-word { border-radius: 6px; padding: 3px 8px; cursor: default; line-height: 1.4; }
-.random-btn {
-  width: 100%; padding: 14px; margin-bottom: 12px;
-  border: 1px solid rgba(224,108,159,0.3); border-radius: 14px;
-  background: rgba(224,108,159,0.06); color: #e06c9f;
-  font-size: 13px; font-family: inherit; cursor: pointer;
-}
-.random-btn:active { opacity: 0.75; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{min-height:100vh;background:#0d0c14;font-family:-apple-system,'PingFang TC','Microsoft JhengHei',Georgia,serif;color:#fffffe;overflow-x:hidden;}
+.bg-grad{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 15% 15%,#1c1538 0%,transparent 55%),radial-gradient(ellipse at 85% 85%,#0b1c2e 0%,transparent 55%);}
+.bg-glow{position:fixed;top:-100px;right:-60px;width:280px;height:280px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,195,100,0.07) 0%,transparent 70%);}
+.wrap{position:relative;max-width:500px;margin:0 auto;padding:36px 20px 100px;}
+header{text-align:center;margin-bottom:32px;}
+.eyebrow{font-size:10px;letter-spacing:0.4em;color:#7a768f;margin-bottom:8px;text-transform:uppercase;}
+h1{font-size:52px;font-weight:700;letter-spacing:-0.02em;background:linear-gradient(135deg,#ffc364 0%,#ff8c6b 45%,#e06c9f 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.date-label{font-size:13px;color:#5c5875;margin-top:6px;}
+.streak{font-size:11px;color:#4a4660;margin-top:4px;min-height:16px;}
+nav{display:flex;gap:6px;margin-bottom:28px;background:rgba(255,255,255,0.04);border-radius:12px;padding:4px;}
+nav button{flex:1;padding:10px 6px;border:none;border-radius:9px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:400;background:transparent;color:#5c5875;transition:all 0.2s;}
+nav button.active{background:rgba(255,195,100,0.14);color:#ffc364;font-weight:600;}
+.section{margin-bottom:28px;}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.section-num{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;}
+.section-label{font-size:12px;color:#7a768f;letter-spacing:0.06em;}
+.input-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.input-idx{font-size:11px;color:#3c3a50;padding-top:14px;width:12px;text-align:right;flex-shrink:0;}
+textarea{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 14px;color:#fffffe;font-size:14px;font-family:inherit;resize:none;line-height:1.65;transition:border-color 0.2s;overflow:hidden;min-height:44px;}
+textarea:focus{outline:none;border-color:rgba(255,195,100,0.35);}
+textarea::placeholder{color:#3c3a50;}
+.save-btn{width:100%;padding:16px;margin-top:4px;border:1px solid rgba(255,195,100,0.25);border-radius:14px;background:linear-gradient(135deg,rgba(255,195,100,0.12),rgba(224,108,159,0.12));color:#ffc364;font-size:15px;font-family:inherit;cursor:pointer;font-weight:600;letter-spacing:0.04em;transition:all 0.3s;}
+.save-btn.saved{border-color:rgba(100,200,130,0.3);background:rgba(100,200,130,0.12);color:#64c882;}
+.save-btn.error{border-color:rgba(255,100,100,0.3);background:rgba(255,100,100,0.12);color:#ff6464;}
+.save-btn:active{opacity:0.75;}
+.hint{text-align:center;margin-top:8px;font-size:11px;color:#3c3a50;min-height:16px;}
+.hint.green{color:#64c882;}
+.notice{margin-bottom:20px;padding:10px 14px;border-radius:10px;font-size:12px;}
+.notice.green{background:rgba(100,200,130,0.08);color:#64c882;border:1px solid rgba(100,200,130,0.2);}
+.notice.blue{background:rgba(108,159,224,0.08);color:#6c9fe0;border:1px solid rgba(108,159,224,0.2);}
+input[type=date],.search-input{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 14px;color:#fffffe;font-size:14px;font-family:inherit;transition:border-color 0.2s;color-scheme:dark;width:100%;outline:none;}
+input[type=date]:focus,.search-input:focus{border-color:rgba(255,195,100,0.35);}
+.search-input::placeholder{color:#3c3a50;}
+.date-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.date-row label{font-size:12px;color:#7a768f;flex-shrink:0;}
+.search-wrap{position:relative;margin-bottom:16px;}
+.search-wrap::before{content:"🔍";position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;}
+.search-input{padding-left:36px;}
+.heatmap-wrap{margin-bottom:20px;}
+.heatmap-label{font-size:11px;color:#4a4660;margin-bottom:8px;}
+.heatmap-grid{display:flex;flex-wrap:wrap;gap:3px;}
+.heatmap-cell{width:12px;height:12px;border-radius:2px;}
+.heatmap-legend{display:flex;gap:8px;margin-top:6px;align-items:center;font-size:10px;color:#4a4660;}
+.heatmap-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.backup-row{display:flex;gap:8px;margin-bottom:16px;}
+.backup-btn{flex:1;padding:10px;border:1px solid rgba(255,255,255,0.08);border-radius:10px;background:rgba(255,255,255,0.03);color:#a8a4c0;font-size:12px;font-family:inherit;cursor:pointer;}
+.backup-btn:active{opacity:0.75;}
+.new-btn{width:100%;padding:14px;margin-bottom:16px;border:1px dashed rgba(255,195,100,0.3);border-radius:14px;background:transparent;color:#ffc364;font-size:13px;font-family:inherit;cursor:pointer;}
+.new-btn:active{opacity:0.75;}
+.history-meta{display:flex;justify-content:space-between;font-size:12px;color:#4a4660;margin-bottom:16px;}
+.entry-card{width:100%;text-align:left;padding:16px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;cursor:pointer;font-family:inherit;color:#fffffe;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.entry-card.today{background:rgba(255,195,100,0.06);border-color:rgba(255,195,100,0.2);}
+.entry-card:active{opacity:0.75;}
+.entry-date{font-size:13px;color:#a8a4c0;margin-bottom:4px;}
+.entry-card.today .entry-date{color:#ffc364;}
+.entry-stats{font-size:11px;color:#4a4660;}
+.entry-star{font-size:16px;color:#3c3a50;}
+.entry-star.done{color:#ffc364;}
+.empty{text-align:center;padding:40px 20px;color:#4a4660;}
+.empty .moon{font-size:32px;margin-bottom:12px;}
+.empty p{font-size:14px;}
+.empty small{font-size:12px;color:#3a3650;margin-top:6px;display:block;}
+.no-result{text-align:center;padding:30px;color:#4a4660;font-size:13px;}
+.back-btn{background:none;border:none;color:#7a768f;cursor:pointer;font-size:13px;font-family:inherit;margin-bottom:20px;padding:0;}
+.detail-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+.detail-date{font-size:14px;color:#a8a4c0;}
+.detail-actions{display:flex;gap:8px;}
+.edit-btn{background:rgba(255,195,100,0.1);border:1px solid rgba(255,195,100,0.25);border-radius:8px;padding:6px 12px;color:#ffc364;font-size:12px;font-family:inherit;cursor:pointer;}
+.del-btn{background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.2);border-radius:8px;padding:6px 12px;color:#ff6464;font-size:12px;font-family:inherit;cursor:pointer;}
+.detail-section{margin-bottom:22px;}
+.detail-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.detail-num{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+.detail-lbl{font-size:11px;color:#5c5875;}
+.detail-item{padding:12px 16px;background:rgba(255,255,255,0.03);border-radius:10px;font-size:14px;line-height:1.7;color:#ccc8e4;margin-bottom:6px;}
+.detail-empty{font-size:13px;color:#3c3a50;font-style:italic;padding-left:4px;}
+.detail-ts{font-size:11px;color:#3c3a50;margin-top:16px;}
+.del-confirm{margin-top:20px;padding:16px;border-radius:12px;background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.2);}
+.del-confirm p{font-size:13px;color:#ff6464;margin-bottom:12px;}
+.del-btns{display:flex;gap:8px;}
+.del-yes{flex:1;padding:10px;border:1px solid rgba(255,80,80,0.3);border-radius:8px;background:rgba(255,80,80,0.15);color:#ff6464;font-size:13px;font-family:inherit;cursor:pointer;}
+.del-no{flex:1;padding:10px;border:1px solid rgba(255,255,255,0.08);border-radius:8px;background:rgba(255,255,255,0.04);color:#7a768f;font-size:13px;font-family:inherit;cursor:pointer;}
+.insight-title{font-size:11px;letter-spacing:0.1em;color:#7a768f;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.insight-title-line{flex:1;height:1px;background:rgba(255,255,255,0.06);}
+.insight-sec{margin-bottom:32px;}
+.period-tabs{display:flex;gap:6px;margin-bottom:16px;}
+.period-tab{padding:6px 14px;border:1px solid rgba(255,255,255,0.08);border-radius:20px;background:transparent;color:#5c5875;font-size:12px;font-family:inherit;cursor:pointer;}
+.period-tab.active{background:rgba(255,195,100,0.14);border-color:rgba(255,195,100,0.3);color:#ffc364;}
+.stat-row{display:flex;gap:10px;margin-bottom:10px;}
+.stat-box{flex:1;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;text-align:center;}
+.stat-num{font-size:28px;font-weight:700;color:#ffc364;}
+.stat-lbl{font-size:11px;color:#4a4660;margin-top:4px;}
+.annual-box{background:linear-gradient(135deg,rgba(255,195,100,0.08),rgba(224,108,159,0.08));border:1px solid rgba(255,195,100,0.15);border-radius:14px;padding:20px;margin-bottom:10px;}
+.annual-num{font-size:36px;font-weight:700;background:linear-gradient(135deg,#ffc364,#e06c9f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.annual-lbl{font-size:12px;color:#7a768f;margin-top:4px;}
+.insight-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:18px 20px;margin-bottom:10px;}
+.insight-card p{font-size:14px;line-height:1.7;color:#ccc8e4;}
+.insight-meta{font-size:11px;color:#4a4660;margin-bottom:8px;}
+.year-ago{background:rgba(255,195,100,0.06);border:1px solid rgba(255,195,100,0.2);border-radius:14px;padding:16px 18px;margin-bottom:28px;}
+.year-ago-lbl{font-size:11px;color:#ffc364;margin-bottom:10px;letter-spacing:0.05em;}
+.year-ago-item{font-size:13px;color:#ccc8e4;line-height:1.7;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.year-ago-item:last-child{border-bottom:none;}
+.wc-wrap{padding:20px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;}
+.wc-inner{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;min-height:80px;}
+.wc-word{border-radius:6px;padding:3px 8px;line-height:1.4;}
+.random-btn{width:100%;padding:14px;margin-bottom:12px;border:1px solid rgba(224,108,159,0.3);border-radius:14px;background:rgba(224,108,159,0.06);color:#e06c9f;font-size:13px;font-family:inherit;cursor:pointer;}
+.random-btn:active{opacity:0.75;}
+.random-card{background:rgba(255,255,255,0.03);border:1px solid rgba(224,108,159,0.2);border-radius:14px;padding:18px 20px;}
+.random-date{font-size:13px;color:#a8a4c0;margin-bottom:14px;}
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:rgba(30,28,50,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:10px 20px;font-size:13px;color:#fffffe;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;z-index:999;}
+.toast.show{opacity:1;}
 </style>
 </head>
 <body>
@@ -260,537 +135,524 @@ input[type="date"]:focus, .search-input:focus { outline: none; border-color: rgb
     <p class="streak" id="streak-label"></p>
   </header>
   <nav>
-    <button class="active" id="nav-today" onclick="switchView('today')">✦ 今天</button>
-    <button id="nav-history" onclick="switchView('history')">回顧</button>
-    <button id="nav-insight" onclick="switchView('insight')">洞察</button>
+    <button class="active" id="nav-today" onclick="gotoView('today')">✦ 今天</button>
+    <button id="nav-history" onclick="gotoView('history')">回顧</button>
+    <button id="nav-insight" onclick="gotoView('insight')">洞察</button>
   </nav>
-  <div id="view-today"></div>
-  <div id="view-history" style="display:none"></div>
-  <div id="view-detail" style="display:none"></div>
-  <div id="view-edit" style="display:none"></div>
-  <div id="view-insight" style="display:none"></div>
+  <div id="app"></div>
 </div>
 <script>
-var STORAGE_KEY = "321journal-v1";
-var todayKey = getTodayKey();
-var entries = loadData();
-var draft = makeDraft(entries[todayKey]);
-var editingDate = null;
-var editDraft = null;
-var autoSaveTimer = null;
-var searchQuery = "";
-var insightPeriod = "week";
+// ── Constants & helpers ──────────────────────────────────────────
+var SK = "321journal-v1";
+var C3 = "#ffc364", C2 = "#e06c9f", C1 = "#6c9fe0";
 
-function getTodayKey() {
+function todayKey() {
 var d = new Date();
-return d.getFullYear() + “-” + pad(d.getMonth()+1) + “-” + pad(d.getDate());
+return d.getFullYear() + “-” + p2(d.getMonth()+1) + “-” + p2(d.getDate());
 }
-function pad(n) { return String(n).padStart(2,“0”); }
-function formatDate(dateStr) {
-var d = new Date(dateStr + “T00:00:00”);
-return d.toLocaleDateString(“zh-TW”, {year:“numeric”,month:“long”,day:“numeric”,weekday:“long”});
+function p2(n) { return (“0”+n).slice(-2); }
+function fmtDate(s) {
+var d = new Date(s+“T00:00:00”);
+return d.toLocaleDateString(“zh-TW”,{year:“numeric”,month:“long”,day:“numeric”,weekday:“long”});
 }
-function isComplete(e) {
+function complete(e) {
 return e && e.events && e.events.every(function(v){return v.trim();}) &&
 e.thanks && e.thanks.every(function(v){return v.trim();}) && e.tomorrow && e.tomorrow.trim();
 }
-function loadData() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) { return {}; } }
-function saveData(data) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); return true; } catch(e) { return false; } }
-function esc(str) {
-return (str||””).replace(/&/g,”&”).replace(/</g,”<”).replace(/>/g,”>”).replace(/”/g,”"”);
+function blankDraft() { return {events:[””,””,””],thanks:[””,””],tomorrow:””}; }
+function copyDraft(e) {
+if (!e) return blankDraft();
+return {events:e.events.slice(),thanks:e.thanks.slice(),tomorrow:e.tomorrow||””};
 }
-function autoResize(el) { el.style.height = “auto”; el.style.height = el.scrollHeight + “px”; }
-function showToast(msg) {
-var t = document.getElementById(“toast”);
-t.textContent = msg; t.classList.add(“show”);
-setTimeout(function(){ t.classList.remove(“show”); }, 2500);
-}
-function makeDraft(e) {
-if (e) return { events: e.events.slice(), thanks: e.thanks.slice(), tomorrow: e.tomorrow };
-return { events: [””,””,””], thanks: [””,””], tomorrow: “” };
-}
-
-if (“serviceWorker” in navigator) {
-window.addEventListener(“load”, function() {
-navigator.serviceWorker.register(”./sw.js”).catch(function(){});
-});
+function loadDB() { try { return JSON.parse(localStorage.getItem(SK))||{}; } catch(e){return{};} }
+function saveDB(d) { try { localStorage.setItem(SK,JSON.stringify(d)); return true; } catch(e){return false;} }
+function H(s) { return (s||””).replace(/&/g,”&”).replace(/</g,”<”).replace(/>/g,”>”).replace(/”/g,”"”); }
+function resize(el) { el.style.height=“auto”; el.style.height=el.scrollHeight+“px”; }
+function toast(msg) {
+var t=document.getElementById(“toast”);
+t.textContent=msg; t.classList.add(“show”);
+setTimeout(function(){t.classList.remove(“show”);},2500);
 }
 
-window.addEventListener(“DOMContentLoaded”, function() {
-document.getElementById(“today-label”).textContent = formatDate(todayKey);
+// ── State ────────────────────────────────────────────────────────
+var TK = todayKey();
+var DB = loadDB();
+var view = “today”;
+var draft = copyDraft(DB[TK]);
+var editDate = null;
+var editIsNew = false;
+var editDraft = null;
+var detailDate = null;
+var showDelConfirm = false;
+var autoTimer = null;
+var searchQ = “”;
+var period = “week”;
+var randomDate = null;
+
+// ── Boot ─────────────────────────────────────────────────────────
+function boot() {
+document.getElementById(“today-label”).textContent = fmtDate(TK);
 updateStreak();
-renderToday();
-});
+render();
+if (“serviceWorker” in navigator) {
+navigator.serviceWorker.register(”./sw.js”).catch(function(){});
+}
+}
 
 function updateStreak() {
-var count = Object.keys(entries).length;
-var done = Object.values(entries).filter(isComplete).length;
-document.getElementById(“streak-label”).textContent = count > 0 ? “已累積 “ + count + “ 天紀錄 · 完整 “ + done + “ 天 ✦” : “”;
-document.getElementById(“nav-history”).textContent = “回顧” + (count > 0 ? “ (” + count + “)” : “”);
+var keys = Object.keys(DB);
+var cnt = keys.length;
+var done = keys.filter(function(k){return complete(DB[k]);}).length;
+document.getElementById(“streak-label”).textContent = cnt>0 ? “已累積 “+cnt+” 天紀錄 · 完整 “+done+” 天 ✦” : “”;
+document.getElementById(“nav-history”).textContent = “回顧”+(cnt>0?” (”+cnt+”)”:””);
 }
 
-function switchView(v) {
-if (v !== “history”) { searchQuery = “”; document.getElementById(“view-history”).innerHTML = “”; }
-[“today”,“history”,“detail”,“edit”,“insight”].forEach(function(n) {
-document.getElementById(“view-”+n).style.display = n === v ? “” : “none”;
+// ── Routing ──────────────────────────────────────────────────────
+function gotoView(v) {
+if (v !== “history”) searchQ = “”;
+view = v; detailDate = null; editDate = null; editIsNew = false; showDelConfirm = false;
+[“today”,“history”,“insight”].forEach(function(n){
+document.getElementById(“nav-”+n).className = n===v ? “active” : “”;
 });
-document.getElementById(“nav-today”).className = v === “today” ? “active” : “”;
-document.getElementById(“nav-history”).className = v === “history” ? “active” : “”;
-document.getElementById(“nav-insight”).className = v === “insight” ? “active” : “”;
-if (v === “history”) renderHistory();
-if (v === “insight”) renderInsight();
+render();
 }
 
-// ── TODAY ──────────────────────────────────────
+function render() {
+var html = “”;
+if (view === “today”) html = renderToday();
+else if (view === “history” && !detailDate && !editDate) html = renderHistory();
+else if (view === “history” && detailDate) html = renderDetail();
+else if (view === “edit”) html = renderEdit();
+else if (view === “insight”) html = renderInsight();
+document.getElementById(“app”).innerHTML = html;
+// Post-render setup
+document.querySelectorAll(“textarea”).forEach(function(t){ resize(t); });
+if (view === “history” && !detailDate && !editDate) setupSearch();
+}
+
+// ── TODAY ────────────────────────────────────────────────────────
 function renderToday() {
-var already = entries[todayKey] && entries[todayKey].savedAt;
-var html = already ? ‘<div class="saved-notice">✓ 今天已有儲存紀錄，可繼續編輯</div>’ : “”;
-html += sectionHTML(“3”,“今天發生的事”,“rgba(255,195,100,0.15)”,“rgba(255,195,100,0.35)”,”#ffc364”);
-html += inputRow(1, draft.events[0], “oninput="todayInput(‘event’,0,this)"”, “寫下第一件事…”);
-html += inputRow(2, draft.events[1], “oninput="todayInput(‘event’,1,this)"”, “寫下第二件事…”);
-html += inputRow(3, draft.events[2], “oninput="todayInput(‘event’,2,this)"”, “寫下第三件事…”);
+var already = DB[TK] && DB[TK].savedAt;
+var html = already ? ‘<div class="notice green">✓ 今天已有儲存紀錄，可繼續編輯</div>’ : “”;
+html += secHead(“3”,“今天發生的事”,“rgba(255,195,100,0.15)”,“rgba(255,195,100,0.35)”,C3);
+html += iRow(1,draft.events[0],“todayIn(‘event’,0,this)”,“寫下第一件事…”);
+html += iRow(2,draft.events[1],“todayIn(‘event’,1,this)”,“寫下第二件事…”);
+html += iRow(3,draft.events[2],“todayIn(‘event’,2,this)”,“寫下第三件事…”);
 html += “</div></div>”;
-html += sectionHTML(“2”,“今天感謝的事”,“rgba(224,108,159,0.15)”,“rgba(224,108,159,0.35)”,”#e06c9f”);
-html += inputRow(1, draft.thanks[0], “oninput="todayInput(‘thank’,0,this)"”, “感謝什麼…”);
-html += inputRow(2, draft.thanks[1], “oninput="todayInput(‘thank’,1,this)"”, “還有什麼…”);
+html += secHead(“2”,“今天感謝的事”,“rgba(224,108,159,0.15)”,“rgba(224,108,159,0.35)”,C2);
+html += iRow(1,draft.thanks[0],“todayIn(‘thank’,0,this)”,“感謝什麼…”);
+html += iRow(2,draft.thanks[1],“todayIn(‘thank’,1,this)”,“還有什麼…”);
 html += “</div></div>”;
-html += sectionHTML(“1”,“明天想做的一件事”,“rgba(108,159,224,0.15)”,“rgba(108,159,224,0.35)”,”#6c9fe0”);
-html += inputRow(null, draft.tomorrow, “oninput="todayInput(‘tomorrow’,null,this)"”, “一個小小的目標…”);
+html += secHead(“1”,“明天想做的一件事”,“rgba(108,159,224,0.15)”,“rgba(108,159,224,0.35)”,C1);
+html += iRow(0,draft.tomorrow,“todayIn(‘tomorrow’,0,this)”,“一個小小的目標…”);
 html += “</div></div>”;
-html += ‘<button class="save-btn" id="save-btn" onclick="handleSave()">儲存今天的紀錄</button>’;
-html += ‘<p class="autosave-hint" id="autosave-hint">’ + (isComplete(draft) ? “✦ 今日紀錄完整” : “尚有欄位未填寫”) + “</p>”;
-document.getElementById(“view-today”).innerHTML = html;
-document.querySelectorAll(”#view-today textarea”).forEach(function(t){ autoResize(t); });
+html += ‘<button class="save-btn" id="sbtn" onclick="doSave()">儲存今天的紀錄</button>’;
+html += ‘<p class="hint" id="shint">’+(complete(draft)?“✦ 今日紀錄完整”:“尚有欄位未填寫”)+”</p>”;
+return html;
 }
 
-function sectionHTML(num, label, bg, border, color) {
-return ‘<div class="section"><div class="section-header">’ +
-‘<div class="section-num" style="background:' + bg + ';border:1px solid ' + border + ';color:' + color + '">’ + num + ‘</div>’ +
-‘<span class="section-label">’ + label + ‘</span></div><div>’;
+function secHead(num,label,bg,border,color) {
+return ‘<div class="section"><div class="section-header">’+
+‘<div class="section-num" style="background:'+bg+';border:1px solid '+border+';color:'+color+'">’+num+’</div>’+
+‘<span class="section-label">’+label+’</span></div><div>’;
+}
+function iRow(idx,val,oninput,ph) {
+var idxH = idx ? ‘<span class="input-idx">’+idx+’</span>’ : ‘’;
+return ‘<div class="input-row">’+idxH+
+‘<textarea placeholder="'+ph+'" oninput="'+oninput+'">’+H(val)+’</textarea></div>’;
 }
 
-function inputRow(idx, val, attrs, placeholder) {
-var idxHtml = idx ? ‘<span class="input-idx">’ + idx + ‘</span>’ : ‘’;
-return ‘<div class="input-row">’ + idxHtml +
-‘<textarea placeholder=”’ + placeholder + ’” ’ + attrs + ‘>’ + esc(val) + ‘</textarea></div>’;
+function todayIn(type,i,el) {
+resize(el);
+if (type===“event”) draft.events[i]=el.value;
+else if (type===“thank”) draft.thanks[i]=el.value;
+else draft.tomorrow=el.value;
+var h=document.getElementById(“shint”);
+if(h) h.textContent=complete(draft)?“✦ 今日紀錄完整”:“尚有欄位未填寫”;
+schedAutoSave(“today”);
 }
 
-function todayInput(type, i, el) {
-autoResize(el);
-if (type === “event”) draft.events[i] = el.value;
-else if (type === “thank”) draft.thanks[i] = el.value;
-else draft.tomorrow = el.value;
-var hint = document.getElementById(“autosave-hint”);
-if (hint) hint.textContent = isComplete(draft) ? “✦ 今日紀錄完整” : “尚有欄位未填寫”;
-scheduleAutoSave(“today”);
-}
-
-function handleSave(quiet) {
-entries[todayKey] = { events: draft.events.slice(), thanks: draft.thanks.slice(), tomorrow: draft.tomorrow, savedAt: new Date().toISOString() };
-var ok = saveData(entries);
+function doSave(quiet) {
+DB[TK]={events:draft.events.slice(),thanks:draft.thanks.slice(),tomorrow:draft.tomorrow,savedAt:new Date().toISOString()};
+var ok=saveDB(DB);
 if (!quiet) {
-var btn = document.getElementById(“save-btn”);
-if (!btn) return ok;
-btn.disabled = true; btn.className = “save-btn saved”; btn.textContent = “✓ 已儲存”;
+var b=document.getElementById(“sbtn”); if(!b) return ok;
+b.disabled=true; b.className=“save-btn saved”; b.textContent=“✓ 已儲存”;
 updateStreak();
-setTimeout(function(){ btn.disabled = false; btn.className = “save-btn”; btn.textContent = “儲存今天的紀錄”; }, 2500);
+setTimeout(function(){b.disabled=false;b.className=“save-btn”;b.textContent=“儲存今天的紀錄”;},2500);
 } else { updateStreak(); }
 return ok;
 }
 
-function scheduleAutoSave(mode) {
-clearTimeout(autoSaveTimer);
-autoSaveTimer = setTimeout(function() {
-var ok = false;
-if (mode === “today”) { ok = handleSave(true); }
-else if (mode === “edit” && editingDate) {
-entries[editingDate] = { events: editDraft.events.slice(), thanks: editDraft.thanks.slice(), tomorrow: editDraft.tomorrow, savedAt: new Date().toISOString() };
-ok = saveData(entries);
-if (editingDate === todayKey) draft = makeDraft(entries[todayKey]);
+function schedAutoSave(mode) {
+clearTimeout(autoTimer);
+autoTimer = setTimeout(function(){
+var ok=false;
+if (mode===“today”) { ok=doSave(true); }
+else if (mode===“edit” && editDate) {
+DB[editDate]={events:editDraft.events.slice(),thanks:editDraft.thanks.slice(),tomorrow:editDraft.tomorrow,savedAt:new Date().toISOString()};
+ok=saveDB(DB);
+if (editDate===TK) draft=copyDraft(DB[TK]);
 updateStreak();
 }
 if (ok) {
-var hint = document.getElementById(“autosave-hint”) || document.getElementById(“edit-autosave-hint”);
-if (hint) {
-hint.textContent = “✓ 已自動儲存”; hint.classList.add(“visible”);
-setTimeout(function(){ hint.classList.remove(“visible”); hint.textContent = “”; }, 2000);
+var h=document.getElementById(“shint”)||document.getElementById(“ehint”);
+if(h){h.textContent=“✓ 已自動儲存”;h.classList.add(“green”);
+setTimeout(function(){h.classList.remove(“green”);h.textContent=””;},2000);}
 }
-}
-}, 1500);
+},1500);
 }
 
-// ── HISTORY ────────────────────────────────────
+// ── HISTORY ──────────────────────────────────────────────────────
 function renderHistory() {
-var existing = document.getElementById(“history-list”);
-if (!existing) {
-var html = ‘<div class="backup-row">’ +
-‘<button class="backup-btn" onclick="exportBackup()">⬇ 備份資料</button>’ +
-‘<button class="backup-btn" onclick="document.getElementById(\'import-input\').click()">⬆ 還原備份</button>’ +
-‘<input type="file" id="import-input" accept=".json" style="display:none" onchange="importBackup(event)" /></div>’ +
-renderHeatmap() +
-‘<div class="search-row"><input class="search-input" id="search-input" type="text" placeholder="搜尋關鍵字…" /></div>’ +
-‘<button class="new-entry-btn" onclick="openNewEntry()">＋ 補寫其他日期的紀錄</button>’ +
-‘<div id="history-list"></div>’;
-document.getElementById(“view-history”).innerHTML = html;
-var si = document.getElementById(“search-input”);
-si.addEventListener(“input”, function() {
-if (!this._composing) { searchQuery = this.value; renderHistoryList(); }
-});
-si.addEventListener(“compositionstart”, function() { this._composing = true; });
-si.addEventListener(“compositionend”, function() { this._composing = false; searchQuery = this.value; renderHistoryList(); });
-}
-renderHistoryList();
-}
+var allDates=Object.keys(DB).sort(function(a,b){return b>a?1:-1;});
+var filtered=searchQ?allDates.filter(function(d){
+var e=DB[d]; return (e.events.concat(e.thanks).concat([e.tomorrow,d])).join(” “).toLowerCase().indexOf(searchQ.toLowerCase())>=0;
+}):allDates;
+var done=allDates.filter(function(d){return complete(DB[d]);}).length;
 
-function renderHistoryList() {
-var listEl = document.getElementById(“history-list”);
-if (!listEl) return;
-var allDates = Object.keys(entries).sort(function(a,b){ return b > a ? 1 : -1; });
-var filtered = searchQuery ? allDates.filter(function(date) {
-var e = entries[date];
-var text = e.events.concat(e.thanks).concat([e.tomorrow, date]).join(” “).toLowerCase();
-return text.indexOf(searchQuery.toLowerCase()) >= 0;
-}) : allDates;
-var done = allDates.filter(function(d){ return isComplete(entries[d]); }).length;
-var html = “”;
-if (allDates.length === 0) {
-html = ‘<div class="history-empty"><div class="moon">🌙</div><p>還沒有任何紀錄</p><small>填完今天後會出現在這裡</small></div>’;
-} else if (filtered.length === 0) {
-html = ‘<div class="no-results">找不到「’ + esc(searchQuery) + ‘」的相關紀錄</div>’;
+var html=’<div class="backup-row">’+
+‘<button class="backup-btn" onclick="doExport()">⬇ 備份資料</button>’+
+‘<button class="backup-btn" onclick="document.getElementById(\'imp\').click()">⬆ 還原備份</button>’+
+‘<input type="file" id="imp" accept=".json" style="display:none" onchange="doImport(event)"/></div>’;
+html += renderHeatmap();
+html += ‘<div class="search-wrap"><input class="search-input" id="srch" type="text" placeholder="搜尋關鍵字…" value="'+H(searchQ)+'" /></div>’;
+html += ‘<button class="new-btn" onclick="openNew()">＋ 補寫其他日期的紀錄</button>’;
+
+if (allDates.length===0) {
+html+=’<div class="empty"><div class="moon">🌙</div><p>還沒有任何紀錄</p><small>填完今天後會出現在這裡</small></div>’;
+} else if (filtered.length===0) {
+html+=’<div class="no-result">找不到「’+H(searchQ)+’」的相關紀錄</div>’;
 } else {
-html += ‘<div class="history-meta"><span>共 ’ + allDates.length + ’ 天</span><span>完整 ’ + done + ’ 天</span></div>’;
-filtered.forEach(function(date) {
-var e = entries[date]; var isToday = date === todayKey; var complete = isComplete(e);
-html += ‘<button class=“entry-card’ + (isToday ? “ today-card” : “”) + ‘” onclick=“openDetail('’ + date + ‘')”>’ +
-‘<div><div class="entry-date">’ + (isToday ? “今天 · “ : “”) + formatDate(date) + ‘</div>’ +
-‘<div class="entry-stats">’ + e.events.filter(function(v){return v.trim();}).length + ’/3 件事 · ’ +
-e.thanks.filter(function(v){return v.trim();}).length + ‘/2 感謝’ + (e.tomorrow && e.tomorrow.trim() ? “ · 目標 ✓” : “”) + ‘</div></div>’ +
-‘<div class=“entry-star’ + (complete ? “ done” : “”) + ‘”>’ + (complete ? “✦” : “○”) + ‘</div></button>’;
+html+=’<div class="history-meta"><span>共 ‘+allDates.length+’ 天</span><span>完整 ‘+done+’ 天</span></div>’;
+filtered.forEach(function(date){
+var e=DB[date]; var isToday=date===TK; var cpl=complete(e);
+html+=’<button class=“entry-card’+(isToday?” today”:””)+’” onclick=“openDetail('’+date+’')”>’ +
+‘<div><div class="entry-date">’+(isToday?“今天 · “:””)+fmtDate(date)+’</div>’+
+‘<div class="entry-stats">’+e.events.filter(function(v){return v.trim();}).length+’/3 件事 · ‘+
+e.thanks.filter(function(v){return v.trim();}).length+’/2 感謝’+(e.tomorrow&&e.tomorrow.trim()?” · 目標 ✓”:””)+’</div></div>’+
+‘<div class=“entry-star’+(cpl?” done”:””)+’”>’+(cpl?“✦”:“○”)+’</div></button>’;
 });
-}
-listEl.innerHTML = html;
-}
-
-function renderHeatmap() {
-var today = new Date(); var cells = “”;
-for (var i = 90; i >= 0; i–) {
-var d = new Date(today); d.setDate(d.getDate() - i);
-var key = d.getFullYear() + “-” + pad(d.getMonth()+1) + “-” + pad(d.getDate());
-var e = entries[key];
-var cls = e ? (isComplete(e) ? “heatmap-cell complete” : “heatmap-cell has-entry”) : “heatmap-cell”;
-cells += ‘<div class="' + cls + '" title="' + formatDate(key) + '"></div>’;
-}
-return ‘<div class="heatmap-wrap"><div class="heatmap-label">最近 3 個月紀錄</div>’ +
-‘<div class="heatmap-grid">’ + cells + ‘</div>’ +
-‘<div style="display:flex;gap:8px;margin-top:6px;align-items:center;font-size:10px;color:#4a4660">’ +
-’<div style="width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,0.05)"></div>無紀錄 ’ +
-’<div style="width:10px;height:10px;border-radius:2px;background:rgba(255,195,100,0.5)"></div>部分填寫 ’ +
-‘<div style="width:10px;height:10px;border-radius:2px;background:#ffc364"></div>完整紀錄</div></div>’;
-}
-
-function exportBackup() {
-var dateStr = getTodayKey();
-var blob = new Blob([JSON.stringify(entries, null, 2)], {type:“application/json”});
-var url = URL.createObjectURL(blob);
-var a = document.createElement(“a”);
-a.href = url; a.download = “321_backup_” + dateStr + “.json”; a.click(); URL.revokeObjectURL(url);
-showToast(“✓ 備份已下載”);
-}
-
-function importBackup(event) {
-var file = event.target.files[0]; if (!file) return;
-var reader = new FileReader();
-reader.onload = function(e) {
-try {
-var data = JSON.parse(e.target.result);
-if (typeof data !== “object” || Array.isArray(data)) throw new Error();
-var keys = Object.keys(data);
-if (keys.length > 0 && !keys[0].match(/^\d{4}-\d{2}-\d{2}$/)) throw new Error();
-for (var i = 0; i < keys.length; i++) {
-var v = data[keys[i]];
-if (!v.events || !Array.isArray(v.events) || !v.thanks || typeof v.tomorrow === “undefined”) throw new Error();
-}
-if (!confirm(“確定要還原備份嗎？這將合併 “ + keys.length + “ 筆紀錄。”)) return;
-for (var k in data) { entries[k] = data[k]; }
-saveData(entries);
-draft = makeDraft(entries[todayKey]);
-updateStreak(); renderHistory(); renderToday();
-showToast(“✓ 成功還原 “ + keys.length + “ 筆紀錄”);
-} catch(err) { showToast(“✗ 備份格式有誤，無法還原”); }
-event.target.value = “”;
-};
-reader.readAsText(file);
-}
-
-// ── DETAIL ─────────────────────────────────────
-function openDetail(date) {
-document.getElementById(“view-history”).style.display = “none”;
-document.getElementById(“view-detail”).style.display = “”;
-renderDetail(date, false);
-}
-
-function renderDetail(date, showDelete) {
-var e = entries[date];
-var c3 = “#ffc364”, c2 = “#e06c9f”, c1 = “#6c9fe0”;
-function items(arr, color) {
-var filled = arr.filter(function(v){ return v && v.trim(); });
-if (!filled.length) return ‘<div class="detail-empty">未填寫</div>’;
-return filled.map(function(item) {
-return ‘<div class="detail-item" style="border-left:2px solid ' + color + '35">’ + esc(item) + ‘</div>’;
-}).join(””);
-}
-var html = ‘<button class="back-btn" onclick="backToHistory()">← 返回列表</button>’ +
-‘<div class="detail-header-row"><div class="detail-date">’ + formatDate(date) + ‘</div>’ +
-‘<div class="detail-actions">’ +
-‘<button class="edit-btn" onclick="openEdit(\'' + date + '\')">✎ 編輯</button>’ +
-‘<button class="delete-btn" onclick="renderDetail(\'' + date + '\',true)">刪除</button></div></div>’ +
-‘<div class="detail-section"><div class="detail-header"><div class="detail-num" style="background:' + c3 + '15;border:1px solid ' + c3 + '35;color:' + c3 + '">3</div><span class="detail-label">那天發生的事</span></div>’ + items(e.events, c3) + ‘</div>’ +
-‘<div class="detail-section"><div class="detail-header"><div class="detail-num" style="background:' + c2 + '15;border:1px solid ' + c2 + '35;color:' + c2 + '">2</div><span class="detail-label">感謝的事</span></div>’ + items(e.thanks, c2) + ‘</div>’ +
-‘<div class="detail-section"><div class="detail-header"><div class="detail-num" style="background:' + c1 + '15;border:1px solid ' + c1 + '35;color:' + c1 + '">1</div><span class="detail-label">隔天想做的事</span></div>’ + items([e.tomorrow], c1) + ‘</div>’;
-if (e.savedAt) html += ’<div class="detail-timestamp">儲存於 ’ + new Date(e.savedAt).toLocaleString(“zh-TW”) + ‘</div>’;
-if (showDelete) {
-html += ‘<div class="delete-confirm"><p>確定要刪除這天的紀錄嗎？此操作無法復原。</p>’ +
-‘<div class="delete-confirm-btns">’ +
-‘<button class="delete-confirm-yes" onclick="deleteEntry(\'' + date + '\')">確定刪除</button>’ +
-‘<button class="delete-confirm-no" onclick="renderDetail(\'' + date + '\',false)">取消</button></div></div>’;
-}
-document.getElementById(“view-detail”).innerHTML = html;
-}
-
-function deleteEntry(date) {
-delete entries[date]; saveData(entries);
-if (date === todayKey) { draft = makeDraft(null); renderToday(); }
-updateStreak(); backToHistory(); showToast(“已刪除此日紀錄”);
-}
-
-function backToHistory() {
-document.getElementById(“view-detail”).style.display = “none”;
-document.getElementById(“view-history”).style.display = “”;
-renderHistoryList();
-}
-
-// ── EDIT ───────────────────────────────────────
-function openEdit(date) {
-editingDate = date;
-editDraft = makeDraft(entries[date]);
-document.getElementById(“view-detail”).style.display = “none”;
-renderEditView(false);
-document.getElementById(“view-edit”).style.display = “”;
-}
-
-function openNewEntry() {
-editingDate = null; editDraft = makeDraft(null);
-document.getElementById(“view-history”).style.display = “none”;
-renderEditView(true);
-document.getElementById(“view-edit”).style.display = “”;
-}
-
-function renderEditView(isNew) {
-var dateVal = editingDate || todayKey;
-var html = ‘<button class="back-btn" onclick="cancelEdit(' + isNew + ')">← 取消</button>’ +
-‘<div class="edit-notice">’ + (isNew ? “📝 補寫過去的紀錄” : “✎ 編輯這天的紀錄”) + ‘</div>’;
-if (isNew) {
-html += ‘<div class="date-picker-row"><label>選擇日期</label>’ +
-‘<input type="date" id="edit-date" value="' + dateVal + '" max="' + todayKey + '" onchange="editingDate=this.value" /></div>’;
-} else {
-html += ‘<div style="font-size:13px;color:#a8a4c0;margin-bottom:20px">’ + formatDate(editingDate) + ‘</div>’;
-}
-html += sectionHTML(“3”,“那天發生的事”,“rgba(255,195,100,0.15)”,“rgba(255,195,100,0.35)”,”#ffc364”);
-html += inputRow(1, editDraft.events[0], “oninput="editInput(‘event’,0,this)"”, “第一件事…”);
-html += inputRow(2, editDraft.events[1], “oninput="editInput(‘event’,1,this)"”, “第二件事…”);
-html += inputRow(3, editDraft.events[2], “oninput="editInput(‘event’,2,this)"”, “第三件事…”);
-html += “</div></div>”;
-html += sectionHTML(“2”,“感謝的事”,“rgba(224,108,159,0.15)”,“rgba(224,108,159,0.35)”,”#e06c9f”);
-html += inputRow(1, editDraft.thanks[0], “oninput="editInput(‘thank’,0,this)"”, “感謝什麼…”);
-html += inputRow(2, editDraft.thanks[1], “oninput="editInput(‘thank’,1,this)"”, “還有什麼…”);
-html += “</div></div>”;
-html += sectionHTML(“1”,“隔天想做的事”,“rgba(108,159,224,0.15)”,“rgba(108,159,224,0.35)”,”#6c9fe0”);
-html += inputRow(null, editDraft.tomorrow, “oninput="editInput(‘tomorrow’,null,this)"”, “一個小小的目標…”);
-html += “</div></div>”;
-html += ‘<button class="save-btn" id="edit-save-btn" onclick="handleEditSave(' + isNew + ')">儲存</button>’;
-html += ‘<p class="autosave-hint" id="edit-autosave-hint"></p>’;
-document.getElementById(“view-edit”).innerHTML = html;
-document.querySelectorAll(”#view-edit textarea”).forEach(function(t){ autoResize(t); });
-}
-
-function editInput(type, i, el) {
-autoResize(el);
-if (type === “event”) editDraft.events[i] = el.value;
-else if (type === “thank”) editDraft.thanks[i] = el.value;
-else editDraft.tomorrow = el.value;
-scheduleAutoSave(“edit”);
-}
-
-function handleEditSave(isNew) {
-var btn = document.getElementById(“edit-save-btn”);
-if (isNew) { var d = document.getElementById(“edit-date”); if (d) editingDate = d.value; }
-if (!editingDate) { editingDate = todayKey; }
-btn.disabled = true; btn.textContent = “儲存中…”;
-entries[editingDate] = { events: editDraft.events.slice(), thanks: editDraft.thanks.slice(), tomorrow: editDraft.tomorrow, savedAt: new Date().toISOString() };
-if (editingDate === todayKey) draft = makeDraft(entries[todayKey]);
-var ok = saveData(entries);
-if (ok) {
-btn.className = “save-btn saved”; btn.textContent = “✓ 已儲存”; updateStreak();
-setTimeout(function() {
-document.getElementById(“view-edit”).style.display = “none”;
-document.getElementById(“view-history”).style.display = “”; renderHistory();
-}, 1000);
-} else {
-btn.className = “save-btn error”; btn.textContent = “儲存失敗，請再試”;
-setTimeout(function(){ btn.disabled = false; btn.className = “save-btn”; btn.textContent = “儲存”; }, 3000);
-}
-}
-
-function cancelEdit(isNew) {
-clearTimeout(autoSaveTimer);
-document.getElementById(“view-edit”).style.display = “none”;
-if (isNew) { document.getElementById(“view-history”).style.display = “”; renderHistory(); }
-else { openDetail(editingDate); }
-}
-
-// ── INSIGHT ────────────────────────────────────
-function renderInsight() {
-var el = document.getElementById(“view-insight”);
-var html = renderYearAgo();
-html += ‘<div class="insight-section"><div class="insight-title">摘要</div>’;
-html += ‘<div class="period-tabs">’;
-[“week”,“month”,“year”].forEach(function(p) {
-var label = p === “week” ? “本週” : p === “month” ? “本月” : “今年”;
-html += ‘<button class=“period-tab’ + (insightPeriod === p ? “ active” : “”) + ‘” onclick=“setInsightPeriod('’ + p + ‘')”>’ + label + ‘</button>’;
-});
-html += ‘</div>’ + renderSummary() + ‘</div>’;
-html += ‘<div class="insight-section"><div class="insight-title">感謝字雲</div>’ + renderWordCloud() + ‘</div>’;
-html += ‘<div class="insight-section"><div class="insight-title">隨機回顧</div>’ +
-‘<button class="random-btn" onclick="renderRandomEntry()">🎲 隨機翻出一天</button>’ +
-‘<div id="random-result"></div></div>’;
-el.innerHTML = html;
-}
-
-function setInsightPeriod(p) { insightPeriod = p; renderInsight(); }
-
-function renderYearAgo() {
-var d = new Date(); d.setFullYear(d.getFullYear() - 1);
-var key = d.getFullYear() + “-” + pad(d.getMonth()+1) + “-” + pad(d.getDate());
-var e = entries[key]; if (!e) return “”;
-var allItems = e.events.concat(e.thanks).concat([e.tomorrow]).filter(function(v){ return v && v.trim(); });
-if (!allItems.length) return “”;
-var html = ‘<div class="year-ago-card"><div class="year-ago-label">✦ 一年前的今天</div>’;
-allItems.forEach(function(item) { html += ‘<div class="year-ago-item">’ + esc(item) + ‘</div>’; });
-return html + ‘</div>’;
-}
-
-function getPeriodDates() {
-var today = new Date(); var keys = [];
-if (insightPeriod === “week”) {
-for (var i = 6; i >= 0; i–) {
-var d = new Date(today); d.setDate(d.getDate() - i);
-keys.push(d.getFullYear() + “-” + pad(d.getMonth()+1) + “-” + pad(d.getDate()));
-}
-} else if (insightPeriod === “month”) {
-var y = today.getFullYear(), m = today.getMonth()+1;
-var days = new Date(y, m, 0).getDate();
-for (var i = 1; i <= days; i++) keys.push(y + “-” + pad(m) + “-” + pad(i));
-} else {
-var y = today.getFullYear();
-for (var mo = 1; mo <= 12; mo++) {
-var days = new Date(y, mo, 0).getDate();
-for (var i = 1; i <= days; i++) {
-var key = y + “-” + pad(mo) + “-” + pad(i);
-if (key <= todayKey) keys.push(key);
-}
-}
-}
-return keys;
-}
-
-function renderSummary() {
-var dates = getPeriodDates();
-var recorded = dates.filter(function(d){ return !!entries[d]; });
-var complete = recorded.filter(function(d){ return isComplete(entries[d]); });
-if (recorded.length === 0) return ‘<div class="insight-card"><p style="color:#4a4660;text-align:center">這段時間還沒有紀錄</p></div>’;
-var allThanks = []; var allGoals = [];
-recorded.forEach(function(d) {
-(entries[d].thanks||[]).forEach(function(v){ if (v.trim()) allThanks.push(v); });
-if (entries[d].tomorrow && entries[d].tomorrow.trim()) allGoals.push(entries[d].tomorrow);
-});
-var label = insightPeriod === “week” ? “本週” : insightPeriod === “month” ? “本月” : “今年”;
-if (insightPeriod === “year”) {
-return ‘<div class="annual-box"><div class="annual-num">’ + recorded.length + ‘</div><div class="annual-label">天留下了紀錄</div></div>’ +
-‘<div class="stat-row">’ +
-‘<div class="stat-box"><div class="stat-num">’ + complete.length + ‘</div><div class="stat-label">完整紀錄天數</div></div>’ +
-‘<div class="stat-box"><div class="stat-num">’ + allThanks.length + ‘</div><div class="stat-label">感謝的事</div></div>’ +
-‘<div class="stat-box"><div class="stat-num">’ + allGoals.length + ‘</div><div class="stat-label">設定的目標</div></div></div>’;
-}
-var html = ‘<div class="stat-row">’ +
-‘<div class="stat-box"><div class="stat-num">’ + recorded.length + ‘<span style="font-size:14px;color:#7a768f">/’ + dates.length + ‘</span></div><div class="stat-label">’ + label + ‘記錄天數</div></div>’ +
-‘<div class="stat-box"><div class="stat-num">’ + complete.length + ‘</div><div class="stat-label">完整紀錄</div></div></div>’;
-if (allThanks.length > 0) {
-html += ’<div class="insight-card"><div class="meta">💛 ’ + label + ‘感謝的事</div>’;
-allThanks.slice(-6).forEach(function(t){ html += ‘<p>・’ + esc(t) + ‘</p>’; });
-html += ‘</div>’;
-}
-if (allGoals.length > 0) {
-html += ’<div class="insight-card"><div class="meta">🎯 ’ + label + ‘設定的目標</div>’;
-allGoals.slice(-5).forEach(function(g){ html += ‘<p>・’ + esc(g) + ‘</p>’; });
-html += ‘</div>’;
 }
 return html;
 }
 
-function renderWordCloud() {
-var allDates = Object.keys(entries);
-if (allDates.length === 0) return ‘<div class="wordcloud-wrap"><p style="text-align:center;color:#4a4660;font-size:13px">還沒有足夠的紀錄</p></div>’;
-var stopWords = {“的”:1,“了”:1,“也”:1,“是”:1,“我”:1,“你”:1,“他”:1,“她”:1,“它”:1,“這”:1,“那”:1,“和”:1,“與”:1,“在”:1,“有”:1,“很”:1,“都”:1,“但”:1,“還”:1,“就”:1,“不”:1,“到”:1,“去”:1,“來”:1,“對”:1,“把”:1,“被”:1,“讓”:1,“因為”:1,“所以”:1,“雖然”:1,“但是”:1,“如果”:1,“可以”:1,“沒有”:1,“一個”:1,“一些”:1,“today”:1,“the”:1,“a”:1,“an”:1,“is”:1,“was”:1,“and”:1,“or”:1,“to”:1,“of”:1,“in”:1,“for”:1,“with”:1,“that”:1,“this”:1,“it”:1};
-var wordCount = {};
-allDates.forEach(function(date) {
-var e = entries[date];
-var texts = (e.thanks||[]).concat(e.events||[]).join(” “);
-var words = texts.split(” “);
-words.forEach(function(w) {
-var word = w.replace(/[，。！？、；：,.!?;:\n\r\t]+/g, “”).trim();
-if (word.length >= 2 && !stopWords[word]) {
-wordCount[word] = (wordCount[word] || 0) + 1;
-}
+function setupSearch() {
+var el=document.getElementById(“srch”); if(!el) return;
+el.addEventListener(“input”,function(){
+if(!this._c){searchQ=this.value; refreshList();}
 });
-});
-var sorted = Object.keys(wordCount).map(function(w){ return [w, wordCount[w]]; }).sort(function(a,b){ return b[1]-a[1]; }).slice(0,40);
-if (sorted.length === 0) return ‘<div class="wordcloud-wrap"><p style="text-align:center;color:#4a4660;font-size:13px">還沒有足夠的紀錄</p></div>’;
-var maxCount = sorted[0][1];
-var colors = [”#ffc364”,”#ff8c6b”,”#e06c9f”,”#6c9fe0”,”#a8e0b0”,”#c4a8e0”];
-var words = sorted.map(function(pair) {
-var word = pair[0], count = pair[1];
-var ratio = count / maxCount;
-var size = Math.round(11 + ratio * 18);
-var opacity = (0.5 + ratio * 0.5).toFixed(2);
-var color = colors[Math.floor(Math.random() * colors.length)];
-return ‘<span class="wc-word" style="font-size:' + size + 'px;color:' + color + ';opacity:' + opacity + '">’ + esc(word) + ‘</span>’;
-}).join(””);
-return ‘<div class="wordcloud-wrap"><div class="wordcloud-inner">’ + words + ‘</div></div>’;
+el.addEventListener(“compositionstart”,function(){this._c=true;});
+el.addEventListener(“compositionend”,function(){this._c=false;searchQ=this.value;refreshList();});
 }
 
-function renderRandomEntry() {
-var dates = Object.keys(entries).filter(function(d){ return d !== todayKey; });
-if (dates.length === 0) { showToast(“還沒有過去的紀錄”); return; }
-var date = dates[Math.floor(Math.random() * dates.length)];
-var e = entries[date];
-var c3 = “#ffc364”, c2 = “#e06c9f”, c1 = “#6c9fe0”;
-function section(arr, color, label) {
-var filled = arr.filter(function(v){ return v && v.trim(); });
-if (!filled.length) return “”;
-var html = ‘<div style="margin-bottom:12px"><div style="font-size:11px;color:' + color + ';margin-bottom:6px;opacity:0.8">’ + label + ‘</div>’;
-filled.forEach(function(item) {
-html += ‘<div style="font-size:13px;color:#ccc8e4;line-height:1.7;padding:6px 12px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:4px;border-left:2px solid ' + color + '35">’ + esc(item) + ‘</div>’;
+function refreshList() {
+// Re-render only the list part without disturbing search input focus
+var allDates=Object.keys(DB).sort(function(a,b){return b>a?1:-1;});
+var filtered=searchQ?allDates.filter(function(d){
+var e=DB[d]; return (e.events.concat(e.thanks).concat([e.tomorrow,d])).join(” “).toLowerCase().indexOf(searchQ.toLowerCase())>=0;
+}):allDates;
+var done=allDates.filter(function(d){return complete(DB[d]);}).length;
+var app=document.getElementById(“app”); if(!app) return;
+// Remove old list content after the new-btn
+var newBtn=app.querySelector(”.new-btn”);
+if(!newBtn) return;
+// Remove all siblings after new-btn
+while(newBtn.nextSibling) newBtn.parentNode.removeChild(newBtn.nextSibling);
+// Build new list HTML
+var div=document.createElement(“div”);
+if (allDates.length===0) {
+div.innerHTML=’<div class="empty"><div class="moon">🌙</div><p>還沒有任何紀錄</p><small>填完今天後會出現在這裡</small></div>’;
+} else if (filtered.length===0) {
+div.innerHTML=’<div class="no-result">找不到「’+H(searchQ)+’」的相關紀錄</div>’;
+} else {
+var html=’<div class="history-meta"><span>共 ‘+allDates.length+’ 天</span><span>完整 ‘+done+’ 天</span></div>’;
+filtered.forEach(function(date){
+var e=DB[date]; var isToday=date===TK; var cpl=complete(e);
+html+=’<button class=“entry-card’+(isToday?” today”:””)+’” onclick=“openDetail('’+date+’')”>’ +
+‘<div><div class="entry-date">’+(isToday?“今天 · “:””)+fmtDate(date)+’</div>’+
+‘<div class="entry-stats">’+e.events.filter(function(v){return v.trim();}).length+’/3 件事 · ‘+
+e.thanks.filter(function(v){return v.trim();}).length+’/2 感謝’+(e.tomorrow&&e.tomorrow.trim()?” · 目標 ✓”:””)+’</div></div>’+
+‘<div class=“entry-star’+(cpl?” done”:””)+’”>’+(cpl?“✦”:“○”)+’</div></button>’;
 });
-return html + ‘</div>’;
+div.innerHTML=html;
 }
-var html = ‘<div class="insight-card" style="border-color:rgba(224,108,159,0.2)">’ +
-‘<div style="font-size:13px;color:#a8a4c0;margin-bottom:14px">’ + formatDate(date) + ‘</div>’ +
-section(e.events, c3, “那天發生的事”) +
-section(e.thanks, c2, “感謝的事”) +
-(e.tomorrow && e.tomorrow.trim() ? section([e.tomorrow], c1, “隔天想做的事”) : “”) +
-‘<button class="random-btn" style="margin-top:8px;margin-bottom:0" onclick="renderRandomEntry()">🎲 再來一次</button></div>’;
-document.getElementById(“random-result”).innerHTML = html;
+while(div.firstChild) app.appendChild(div.firstChild);
 }
+
+function renderHeatmap() {
+var today=new Date(); var cells=””;
+for(var i=90;i>=0;i–){
+var d=new Date(today); d.setDate(d.getDate()-i);
+var key=d.getFullYear()+”-”+p2(d.getMonth()+1)+”-”+p2(d.getDate());
+var e=DB[key];
+var bg=e?(complete(e)?”#ffc364”:“rgba(255,195,100,0.5)”):“rgba(255,255,255,0.05)”;
+cells+=’<div class="heatmap-cell" style="background:'+bg+'" title="'+fmtDate(key)+'"></div>’;
+}
+return ‘<div class="heatmap-wrap"><div class="heatmap-label">最近 3 個月紀錄</div>’+
+‘<div class="heatmap-grid">’+cells+’</div>’+
+‘<div class="heatmap-legend">’+
+’<div class="heatmap-dot" style="background:rgba(255,255,255,0.05)"></div>無紀錄 ’+
+’<div class="heatmap-dot" style="background:rgba(255,195,100,0.5)"></div>部分填寫 ’+
+‘<div class="heatmap-dot" style="background:#ffc364"></div>完整紀錄</div></div>’;
+}
+
+function doExport() {
+var blob=new Blob([JSON.stringify(DB,null,2)],{type:“application/json”});
+var url=URL.createObjectURL(blob);
+var a=document.createElement(“a”); a.href=url; a.download=“321_backup_”+TK+”.json”; a.click(); URL.revokeObjectURL(url);
+toast(“✓ 備份已下載”);
+}
+
+function doImport(ev) {
+var file=ev.target.files[0]; if(!file) return;
+var r=new FileReader();
+r.onload=function(e){
+try{
+var data=JSON.parse(e.target.result);
+if(typeof data!==“object”||Array.isArray(data)) throw 0;
+var keys=Object.keys(data);
+if(keys.length>0&&!/^\d{4}-\d{2}-\d{2}$/.test(keys[0])) throw 0;
+for(var i=0;i<keys.length;i++){var v=data[keys[i]];if(!v.events||!Array.isArray(v.events)||!v.thanks||typeof v.tomorrow===“undefined”) throw 0;}
+if(!confirm(“確定要還原備份嗎？這將合併 “+keys.length+” 筆紀錄。”)) return;
+for(var k in data) DB[k]=data[k];
+saveDB(DB); draft=copyDraft(DB[TK]); updateStreak(); render();
+toast(“✓ 成功還原 “+keys.length+” 筆紀錄”);
+}catch(err){toast(“✗ 備份格式有誤，無法還原”);}
+ev.target.value=””;
+};
+r.readAsText(file);
+}
+
+// ── DETAIL ───────────────────────────────────────────────────────
+function openDetail(date) { detailDate=date; showDelConfirm=false; render(); }
+
+function renderDetail() {
+var e=DB[detailDate];
+function dItems(arr,color) {
+var filled=arr.filter(function(v){return v&&v.trim();});
+if(!filled.length) return ‘<div class="detail-empty">未填寫</div>’;
+return filled.map(function(v){return ‘<div class="detail-item" style="border-left:2px solid '+color+'35">’+H(v)+’</div>’;}).join(””);
+}
+var html=’<button class="back-btn" onclick="backToHistory()">← 返回列表</button>’+
+‘<div class="detail-top"><div class="detail-date">’+fmtDate(detailDate)+’</div>’+
+‘<div class="detail-actions">’+
+‘<button class="edit-btn" onclick="openEdit(\''+detailDate+'\')">✎ 編輯</button>’+
+‘<button class="del-btn" onclick="showDel()">刪除</button></div></div>’+
+‘<div class="detail-section"><div class="detail-head"><div class="detail-num" style="background:'+C3+'15;border:1px solid '+C3+'35;color:'+C3+'">3</div><span class="detail-lbl">那天發生的事</span></div>’+dItems(e.events,C3)+’</div>’+
+‘<div class="detail-section"><div class="detail-head"><div class="detail-num" style="background:'+C2+'15;border:1px solid '+C2+'35;color:'+C2+'">2</div><span class="detail-lbl">感謝的事</span></div>’+dItems(e.thanks,C2)+’</div>’+
+‘<div class="detail-section"><div class="detail-head"><div class="detail-num" style="background:'+C1+'15;border:1px solid '+C1+'35;color:'+C1+'">1</div><span class="detail-lbl">隔天想做的事</span></div>’+dItems([e.tomorrow],C1)+’</div>’;
+if(e.savedAt) html+=’<div class="detail-ts">儲存於 ‘+new Date(e.savedAt).toLocaleString(“zh-TW”)+’</div>’;
+if(showDelConfirm) html+=’<div class="del-confirm"><p>確定要刪除這天的紀錄嗎？此操作無法復原。</p><div class="del-btns"><button class="del-yes" onclick="doDelete()">確定刪除</button><button class="del-no" onclick="hideDel()">取消</button></div></div>’;
+return html;
+}
+
+function showDel() { showDelConfirm=true; render(); }
+function hideDel() { showDelConfirm=false; render(); }
+function doDelete() {
+var d=detailDate; delete DB[d]; saveDB(DB);
+if(d===TK) draft=blankDraft();
+updateStreak(); backToHistory(); toast(“已刪除此日紀錄”);
+}
+function backToHistory() { detailDate=null; showDelConfirm=false; render(); }
+
+// ── EDIT ─────────────────────────────────────────────────────────
+function openEdit(date) { editDate=date; editIsNew=false; editDraft=copyDraft(DB[date]); view=“edit”; render(); }
+function openNew() { editDate=null; editIsNew=true; editDraft=blankDraft(); view=“edit”; render(); }
+
+function renderEdit() {
+var dateVal=editDate||TK;
+var html=’<button class="back-btn" onclick="cancelEdit()">← 取消</button>’+
+‘<div class="notice blue">’+(editIsNew?“📝 補寫過去的紀錄”:“✎ 編輯這天的紀錄”)+’</div>’;
+if(editIsNew){
+html+=’<div class="date-row"><label>選擇日期</label><input type="date" id="edate" value="'+dateVal+'" max="'+TK+'" onchange="editDate=this.value" /></div>’;
+} else {
+html+=’<div style="font-size:13px;color:#a8a4c0;margin-bottom:20px">’+fmtDate(editDate)+’</div>’;
+}
+html += secHead(“3”,“那天發生的事”,“rgba(255,195,100,0.15)”,“rgba(255,195,100,0.35)”,C3);
+html += iRow(1,editDraft.events[0],“editIn(‘event’,0,this)”,“第一件事…”);
+html += iRow(2,editDraft.events[1],“editIn(‘event’,1,this)”,“第二件事…”);
+html += iRow(3,editDraft.events[2],“editIn(‘event’,2,this)”,“第三件事…”);
+html += “</div></div>”;
+html += secHead(“2”,“感謝的事”,“rgba(224,108,159,0.15)”,“rgba(224,108,159,0.35)”,C2);
+html += iRow(1,editDraft.thanks[0],“editIn(‘thank’,0,this)”,“感謝什麼…”);
+html += iRow(2,editDraft.thanks[1],“editIn(‘thank’,1,this)”,“還有什麼…”);
+html += “</div></div>”;
+html += secHead(“1”,“隔天想做的事”,“rgba(108,159,224,0.15)”,“rgba(108,159,224,0.35)”,C1);
+html += iRow(0,editDraft.tomorrow,“editIn(‘tomorrow’,0,this)”,“一個小小的目標…”);
+html += “</div></div>”;
+html += ‘<button class="save-btn" id="esbtn" onclick="doEditSave()">儲存</button>’;
+html += ‘<p class="hint" id="ehint"></p>’;
+return html;
+}
+
+function editIn(type,i,el) {
+resize(el);
+if(type===“event”) editDraft.events[i]=el.value;
+else if(type===“thank”) editDraft.thanks[i]=el.value;
+else editDraft.tomorrow=el.value;
+schedAutoSave(“edit”);
+}
+
+function doEditSave() {
+if(editIsNew){ var d=document.getElementById(“edate”); if(d) editDate=d.value; }
+if(!editDate) editDate=TK;
+var b=document.getElementById(“esbtn”); b.disabled=true; b.textContent=“儲存中…”;
+DB[editDate]={events:editDraft.events.slice(),thanks:editDraft.thanks.slice(),tomorrow:editDraft.tomorrow,savedAt:new Date().toISOString()};
+if(editDate===TK) draft=copyDraft(DB[TK]);
+var ok=saveDB(DB);
+if(ok){
+b.className=“save-btn saved”; b.textContent=“✓ 已儲存”; updateStreak();
+setTimeout(function(){view=“history”;editDate=null;render();},1000);
+} else {
+b.className=“save-btn error”; b.textContent=“儲存失敗，請再試”;
+setTimeout(function(){b.disabled=false;b.className=“save-btn”;b.textContent=“儲存”;},3000);
+}
+}
+
+function cancelEdit() {
+clearTimeout(autoTimer);
+if(editIsNew){ view=“history”; editDate=null; render(); }
+else { var d=editDate; editDate=null; view=“history”; openDetail(d); }
+}
+
+// ── INSIGHT ──────────────────────────────────────────────────────
+function setPeriod(p) { period=p; render(); }
+function pickRandom() {
+var past=Object.keys(DB).filter(function(d){return d!==TK;});
+if(!past.length){toast(“還沒有過去的紀錄”);return;}
+randomDate=past[Math.floor(Math.random()*past.length)];
+render();
+}
+
+function renderInsight() {
+var allDates=Object.keys(DB).sort(function(a,b){return b>a?1:-1;});
+var html=””;
+
+// Year ago
+var ya=new Date(); ya.setFullYear(ya.getFullYear()-1);
+var yaK=ya.getFullYear()+”-”+p2(ya.getMonth()+1)+”-”+p2(ya.getDate());
+var yaE=DB[yaK];
+if(yaE){
+var yaItems=[].concat(yaE.events,yaE.thanks,[yaE.tomorrow]).filter(function(v){return v&&v.trim();});
+if(yaItems.length){
+html+=’<div class="year-ago"><div class="year-ago-lbl">✦ 一年前的今天</div>’;
+yaItems.forEach(function(v){html+=’<div class="year-ago-item">’+H(v)+’</div>’;});
+html+=’</div>’;
+}
+}
+
+// Summary
+html+=’<div class="insight-sec"><div class="insight-title">摘要<span class="insight-title-line"></span></div>’;
+html+=’<div class="period-tabs">’;
+[{k:“week”,l:“本週”},{k:“month”,l:“本月”},{k:“year”,l:“今年”}].forEach(function(p){
+html+=’<button class=“period-tab’+(period===p.k?” active”:””)+’” onclick=“setPeriod('’+p.k+’')”>’+p.l+’</button>’;
+});
+html+=’</div>’+renderSummary(allDates)+’</div>’;
+
+// Word cloud
+html+=’<div class="insight-sec"><div class="insight-title">感謝字雲<span class="insight-title-line"></span></div>’+renderWC(allDates)+’</div>’;
+
+// Random
+html+=’<div class="insight-sec"><div class="insight-title">隨機回顧<span class="insight-title-line"></span></div>’;
+html+=’<button class="random-btn" onclick="pickRandom()">🎲 隨機翻出一天</button>’;
+if(randomDate && DB[randomDate]){
+var re=DB[randomDate];
+function rItems(arr,color,lbl){
+var f=arr.filter(function(v){return v&&v.trim();});
+if(!f.length) return “”;
+var s=’<div style="margin-bottom:12px"><div style="font-size:11px;color:'+color+';margin-bottom:6px;opacity:0.8">’+lbl+’</div>’;
+f.forEach(function(v){s+=’<div style="font-size:13px;color:#ccc8e4;line-height:1.7;padding:6px 12px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:4px;border-left:2px solid '+color+'35">’+H(v)+’</div>’;});
+return s+’</div>’;
+}
+html+=’<div class="random-card"><div class="random-date">’+fmtDate(randomDate)+’</div>’+
+rItems(re.events,C3,“那天發生的事”)+rItems(re.thanks,C2,“感謝的事”)+
+(re.tomorrow&&re.tomorrow.trim()?rItems([re.tomorrow],C1,“隔天想做的事”):””)+
+‘<button class="random-btn" style="margin-top:8px;margin-bottom:0" onclick="pickRandom()">🎲 再來一次</button></div>’;
+}
+html+=’</div>’;
+return html;
+}
+
+function getPeriodDates() {
+var today=new Date(); var keys=[];
+if(period===“week”){
+for(var i=6;i>=0;i–){var d=new Date(today);d.setDate(d.getDate()-i);keys.push(d.getFullYear()+”-”+p2(d.getMonth()+1)+”-”+p2(d.getDate()));}
+} else if(period===“month”){
+var y=today.getFullYear(),m=today.getMonth()+1,days=new Date(y,m,0).getDate();
+for(var i=1;i<=days;i++) keys.push(y+”-”+p2(m)+”-”+p2(i));
+} else {
+var y=today.getFullYear();
+for(var mo=1;mo<=12;mo++){var days=new Date(y,mo,0).getDate();for(var i=1;i<=days;i++){var k=y+”-”+p2(mo)+”-”+p2(i);if(k<=TK)keys.push(k);}}
+}
+return keys;
+}
+
+function renderSummary(allDates) {
+var dates=getPeriodDates();
+var recorded=dates.filter(function(d){return !!DB[d];});
+var cpl=recorded.filter(function(d){return complete(DB[d]);});
+if(!recorded.length) return ‘<div class="insight-card"><p style="color:#4a4660;text-align:center">這段時間還沒有紀錄</p></div>’;
+var allThanks=[],allGoals=[];
+recorded.forEach(function(d){
+(DB[d].thanks||[]).forEach(function(v){if(v.trim())allThanks.push(v);});
+if(DB[d].tomorrow&&DB[d].tomorrow.trim())allGoals.push(DB[d].tomorrow);
+});
+var lbl=period===“week”?“本週”:period===“month”?“本月”:“今年”;
+if(period===“year”){
+return ‘<div class="annual-box"><div class="annual-num">’+recorded.length+’</div><div class="annual-lbl">天留下了紀錄</div></div>’+
+‘<div class="stat-row">’+
+‘<div class="stat-box"><div class="stat-num">’+cpl.length+’</div><div class="stat-lbl">完整紀錄天數</div></div>’+
+‘<div class="stat-box"><div class="stat-num">’+allThanks.length+’</div><div class="stat-lbl">感謝的事</div></div>’+
+‘<div class="stat-box"><div class="stat-num">’+allGoals.length+’</div><div class="stat-lbl">設定的目標</div></div></div>’;
+}
+var html=’<div class="stat-row">’+
+‘<div class="stat-box"><div class="stat-num">’+recorded.length+’<span style="font-size:14px;color:#7a768f">/’+dates.length+’</span></div><div class="stat-lbl">’+lbl+‘記錄天數</div></div>’+
+‘<div class="stat-box"><div class="stat-num">’+cpl.length+’</div><div class="stat-lbl">完整紀錄</div></div></div>’;
+if(allThanks.length){
+html+=’<div class="insight-card"><div class="insight-meta">💛 ‘+lbl+‘感謝的事</div>’;
+allThanks.slice(-6).forEach(function(t){html+=’<p>・’+H(t)+’</p>’;});
+html+=’</div>’;
+}
+if(allGoals.length){
+html+=’<div class="insight-card"><div class="insight-meta">🎯 ‘+lbl+‘設定的目標</div>’;
+allGoals.slice(-5).forEach(function(g){html+=’<p>・’+H(g)+’</p>’;});
+html+=’</div>’;
+}
+return html;
+}
+
+function renderWC(allDates) {
+if(!allDates.length) return ‘<div class="wc-wrap"><p style="text-align:center;color:#4a4660;font-size:13px">還沒有足夠的紀錄</p></div>’;
+var stop={“的”:1,“了”:1,“也”:1,“是”:1,“我”:1,“你”:1,“他”:1,“她”:1,“它”:1,“這”:1,“那”:1,“和”:1,“與”:1,“在”:1,“有”:1,“很”:1,“都”:1,“但”:1,“還”:1,“就”:1,“不”:1,“到”:1,“去”:1,“來”:1,“對”:1,“把”:1,“被”:1,“讓”:1,“因為”:1,“所以”:1,“可以”:1,“沒有”:1,“一個”:1};
+var wc={};
+allDates.forEach(function(d){
+var e=DB[d];
+var text=(e.thanks||[]).concat(e.events||[]).join(” “);
+text.split(” “).forEach(function(w){
+var word=w.replace(/[，。！？、；：,.!?;:\r\n\t]+/g,””).trim();
+if(word.length>=2&&!stop[word]) wc[word]=(wc[word]||0)+1;
+});
+});
+var pairs=[];
+for(var w in wc) pairs.push([w,wc[w]]);
+pairs.sort(function(a,b){return b[1]-a[1];});
+pairs=pairs.slice(0,40);
+if(!pairs.length) return ‘<div class="wc-wrap"><p style="text-align:center;color:#4a4660;font-size:13px">還沒有足夠的紀錄</p></div>’;
+var max=pairs[0][1];
+var colors=[C3,”#ff8c6b”,C2,C1,”#a8e0b0”,”#c4a8e0”];
+var inner=pairs.map(function(p){
+var ratio=p[1]/max;
+var size=Math.round(11+ratio*18);
+var op=(0.5+ratio*0.5).toFixed(2);
+var color=colors[Math.floor(Math.random()*colors.length)];
+return ‘<span class="wc-word" style="font-size:'+size+'px;color:'+color+';opacity:'+op+'">’+H(p[0])+’</span>’;
+}).join(””);
+return ‘<div class="wc-wrap"><div class="wc-inner">’+inner+’</div></div>’;
+}
+
+// ── Start ────────────────────────────────────────────────────────
+window.onload = boot;
 </script>
 
 </body>
